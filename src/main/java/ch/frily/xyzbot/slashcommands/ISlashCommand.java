@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.commands;
+package ch.frily.xyzbot.slashcommands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;

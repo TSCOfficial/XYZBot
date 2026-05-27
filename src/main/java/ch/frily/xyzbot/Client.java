@@ -1,5 +1,7 @@
 package ch.frily.xyzbot;
 
+import ch.frily.xyzbot.slashcommands.InteractionListener;
+import ch.frily.xyzbot.slashcommands.SlashCommandManager;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 @Slf4j
 public class Client {
@@ -43,7 +46,10 @@ public class Client {
             config = loadConfig();
             client = createClient();
             client.awaitReady();
-            log.debug("Application started successfully!");
+            log.info("Application started successfully!");
+
+            // Load/start stuff
+            SlashCommandManager.getInstance().loadCommands();
 
         } catch (InterruptedException e) {
             log.error(e.getMessage());
@@ -58,7 +64,11 @@ public class Client {
         JDABuilder jdaBuilder = JDABuilder.createDefault(config.get("TOKEN"));
         jdaBuilder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS);
         jdaBuilder.setStatus(OnlineStatus.IDLE);
+        jdaBuilder.setMemberCachePolicy(MemberCachePolicy.ALL);
         jdaBuilder.setActivity(Activity.customStatus("Lasset die neue Ära beginnen!"));
+        // Event listeners
+        jdaBuilder.addEventListeners(InteractionListener.getInstance());
+        jdaBuilder.addEventListeners(OnReadyListener.getInstance());
         return jdaBuilder.build();
     }
 
