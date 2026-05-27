@@ -1,7 +1,6 @@
 package ch.frily.xyzbot.utils;
 
 import ch.frily.xyzbot.Client;
-import ch.frily.xyzbot.exceptions.InvalidKeyword;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;

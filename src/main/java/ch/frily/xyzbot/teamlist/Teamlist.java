@@ -55,6 +55,11 @@ public class Teamlist {
         embedBuilder.setTimestamp(new Date().toInstant());
         embedBuilder.setColor(new Color(46, 204, 113));
         fillWithBlankFields(embedBuilder);
+
+        List<Member> teammembers = getUsersByRole(IdResolver.getRoleById("ROLE_TEAM"));
+        embedBuilder.addField("Gesammtes Team (" + teammembers.size() + ")",
+                                teammembers.stream().map(Member::getAsMention).collect(Collectors.joining(", ")), false);
+
         return embedBuilder.build();
     }
 
@@ -76,7 +81,7 @@ public class Teamlist {
      * @param role
      */
     private MessageEmbed.Field generateFieldByRole(Role role) {
-        String userList = "Bewirb dich!";
+        String userList = "*Bewirb dich!*";
         int userCount = 0;
 
         if (!getUsersByRole(role).isEmpty()) {
