@@ -5,6 +5,7 @@ import ch.frily.xyzbot.utils.IdResolver;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.reflections.Reflections;
 
@@ -57,7 +58,7 @@ public class SlashCommandManager {
         });
 
         for (ISlashCommand command : slashCommands) {
-            IdResolver.getGuildById("GUILD_XYZCRAFT").upsertCommand(command.getName(), command.getDescription()).queue();
+            IdResolver.getGuildById("GUILD_XYZCRAFT").upsertCommand(command.getName(), command.getDescription()).setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions())).queue();
 //            if (command.getOptions() == null) {
 //                Client.getInstance().getClient().upsertCommand(
 //                        command.getName(),

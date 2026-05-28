@@ -5,6 +5,7 @@ import ch.frily.xyzbot.slashcommands.ISlashCommand;
 import ch.frily.xyzbot.teamlist.Teamlist;
 import ch.frily.xyzbot.utils.IdResolver;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -43,6 +44,11 @@ public class TeamlistCmd implements ISlashCommand {
     @Override
     public Map<String, List<?>> getAutocomplete() {
         return Map.of();
+    }
+
+    @Override
+    public List<Permission> getDefaultPermissions() {
+        return List.of(Permission.ADMINISTRATOR);
     }
 
     @Override

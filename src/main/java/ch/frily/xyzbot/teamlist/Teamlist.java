@@ -52,7 +52,6 @@ public class Teamlist {
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("XYZCraft Team");
         fields.forEach(embedBuilder::addField);
-        embedBuilder.setFooter("Zuletzt aktualisiert am");
         embedBuilder.setTimestamp(new Date().toInstant());
         embedBuilder.setColor(new Color(46, 204, 113));
         fillWithBlankFields(embedBuilder);

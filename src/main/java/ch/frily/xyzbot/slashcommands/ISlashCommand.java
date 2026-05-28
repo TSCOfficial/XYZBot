@@ -1,5 +1,6 @@
 package ch.frily.xyzbot.slashcommands;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,12 @@ public interface ISlashCommand {
      * @return a {@link Map} of a {@link String} & a {@link List}.
      */
     Map<String, List<?>> getAutocomplete();
+
+    /**
+     * Get the default permissions of a slashcommand
+     * @return a list of {@link Permission}
+     */
+    List<Permission> getDefaultPermissions();
 
     /**
      * Execute a slashcommand by its interaction event.<br>
