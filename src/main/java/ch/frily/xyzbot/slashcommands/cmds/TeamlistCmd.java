@@ -54,7 +54,9 @@ public class TeamlistCmd implements ISlashCommand {
     @Override
     public void execute(@NotNull SlashCommandInteractionEvent event) {
         MessageEmbed embed = Teamlist.getInstance().generateEmbed();
-        ActionRow components = ActionRow.of(Button.link("https://discord.com/channels/719211950269005857/737440736529875035", "Bewerben"));
+        ActionRow components = ActionRow.of(
+                Button.link("https://discord.com/channels/719211950269005857/737440736529875035", "Bewerben"),
+                Button.link(Client.getInstance().getConfig().get("DOCMOST_AUFBAUORGA"), "Aufbauorganisation"));
         TextChannel channel = (TextChannel) IdResolver.getChannelById(TextChannel.class, "GUILD_XYZCRAFT", "CHANNEL_TEAMLIST");
 
         event.deferReply(true).queue();
