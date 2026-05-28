@@ -34,8 +34,6 @@ public class Teamlist {
 
     private static final Pattern ROLE_NAME_PATTERN = Pattern.compile("[^\\p{L}\\p{N}\\-\\s]");
 
-    private List<Member> members = new ArrayList<>();
-
     public static Teamlist getInstance() {
         if (instance == null) {
             instance = new Teamlist();

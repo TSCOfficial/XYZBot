@@ -1,8 +1,6 @@
-package ch.frily.xyzbot;
+package ch.frily.xyzbot.listeners;
 
-import ch.frily.xyzbot.utils.IdResolver;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

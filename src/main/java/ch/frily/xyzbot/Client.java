@@ -1,6 +1,8 @@
 package ch.frily.xyzbot;
 
-import ch.frily.xyzbot.slashcommands.InteractionListener;
+import ch.frily.xyzbot.listeners.InteractionListener;
+import ch.frily.xyzbot.listeners.OnReadyListener;
+import ch.frily.xyzbot.listeners.RoleUpdateListener;
 import ch.frily.xyzbot.slashcommands.SlashCommandManager;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -69,6 +71,7 @@ public class Client {
         // Event listeners
         jdaBuilder.addEventListeners(InteractionListener.getInstance());
         jdaBuilder.addEventListeners(OnReadyListener.getInstance());
+        jdaBuilder.addEventListeners(RoleUpdateListener.getInstance());
         return jdaBuilder.build();
     }
 

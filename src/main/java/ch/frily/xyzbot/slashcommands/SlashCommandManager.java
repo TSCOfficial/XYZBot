@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.reflections.Reflections;
 
 import java.util.ArrayList;
@@ -52,28 +53,36 @@ public class SlashCommandManager {
 
     public void updateDiscordCommands() {
 
-        List<Command> commands = Client.getInstance().getClient().retrieveCommands().complete();
-        commands.forEach((cmd) -> {
-            log.warn("Deleting: " + cmd.getName() + " - " + cmd.getDescription());
-        });
+        // Löscht ALLE globalen Commands auf einmal
+        Client.getInstance().getClient().updateCommands().queue(
+                success -> log.info("Alle Commands gelöscht"),
+                error   -> log.error("Fehler: ", error)
+        );
+
+//        Client.getInstance().getClient().retrieveCommands().submit().thenAccept(commands -> {
+//            commands.forEach((cmd) -> {
+//                log.warn("Deleting: " + cmd.getName() + " - " + cmd.getDescription());
+//                Client.getInstance().getClient().deleteCommandById(cmd.getId()).queue();
+//            });
+//        }).exceptionally(exception -> {
+//            log.error(exception.getMessage());
+//            return null;
+//        });
+
 
         for (ISlashCommand command : slashCommands) {
-            IdResolver.getGuildById("GUILD_XYZCRAFT").upsertCommand(command.getName(), command.getDescription()).setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions())).queue();
-//            if (command.getOptions() == null) {
-//                Client.getInstance().getClient().upsertCommand(
-//                        command.getName(),
-//                        command.getDescription()).queue();
-//            } else {
-//                Client.getInstance().getClient().upsertCommand(
-//                                command.getName(),
-//                                command.getDescription()
-//                        )
-//                        .addOptions(command.getOptions()).queue();
-//            }
+            SlashCommandData slashCommandData = Commands.slash(command.getName(), command.getDescription());
+            if (!command.getOptions().isEmpty()) {
+                slashCommandData.addOptions(command.getOptions());
+            }
+            if (!command.getDefaultPermissions().isEmpty()) {
+                slashCommandData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions()));
+            }
+
+            IdResolver.getGuildById("GUILD_XYZCRAFT").upsertCommand(slashCommandData).queue();
             log.info("Slashcommand: " + command.getName());
 
         }
-        //Client.getInstance().getClient().updateCommands().queue();
     }
 
     /**
