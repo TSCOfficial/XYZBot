@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.slashcommands;
 
 import ch.frily.xyzbot.Client;
+import ch.frily.xyzbot.find.FindCmd;
 import ch.frily.xyzbot.teamlist.TeamlistCmd;
 import ch.frily.xyzbot.utils.IdResolver;
 import lombok.Getter;
@@ -39,7 +40,8 @@ public class SlashCommandManager {
      */
     public void loadCommands() {
         slashCommands.addAll(List.of(
-                new TeamlistCmd()
+                new TeamlistCmd(),
+                new FindCmd()
         ));
         updateDiscordCommands();
     }
