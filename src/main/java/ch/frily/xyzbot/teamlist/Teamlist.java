@@ -26,6 +26,7 @@ public class Teamlist {
             "ROLE_PROBEENTWICKLUNG",
             "ROLE_MODERATION",
             "ROLE_SUPPORT",
+            "ROLE_PROBESUPPORT",
             "ROLE_BAUTRUPP",
             "ROLE_PROBEBAUTRUPP",
             "ROLE_GESTALTUNG"
@@ -67,9 +68,9 @@ public class Teamlist {
      * Fill the embed with blank fields to keep the embed structured no matter how many roles there are.
      */
     private void fillWithBlankFields(EmbedBuilder embedBuilder) {
-        int remainder = embedBuilder.getFields().size() % 3;
-        if (remainder != 0) {
-            int blanksNeeded = 3 - remainder;
+        int fieldCountOffset = embedBuilder.getFields().size() % 3;
+        if (fieldCountOffset != 0) {
+            int blanksNeeded = 3 - fieldCountOffset;
             for (int i = 0; i < blanksNeeded; i++) {
                 embedBuilder.addBlankField(true);
             }
@@ -102,10 +103,6 @@ public class Teamlist {
      */
     private List<Member> getUsersByRole(Role role) {
         Guild guild = IdResolver.getGuildById("GUILD_XYZCRAFT");
-        int cached = guild.getMembers().size();
-        int total  = guild.getMemberCount();
-
-        log.debug("Gecacht: {} / Total: {}", cached, total);
         return guild.getMembersWithRoles(role);
     }
 

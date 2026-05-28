@@ -3,15 +3,19 @@ package ch.frily.xyzbot.utils;
 import ch.frily.xyzbot.Client;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import javax.naming.InvalidNameException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Resolve Discord related IDs
@@ -62,19 +66,16 @@ public class IdResolver {
      * @param channelId
      * @return  object
      */
-    public static GuildChannel getChannelById(long guildId, long channelId) {
+    public static <T> T getChannelById(Class<T> type, long guildId, long channelId) {
         Guild guild = getGuildById(guildId);
-        GuildChannel channel = guild.getGuildChannelById(channelId);
 
-        if (channel == null) {
-            throw new NullPointerException("Kanal mit ID " + channelId + " nicht gefunden.");
+        if (type.equals(TextChannel.class)) {
+            return (T) guild.getTextChannelById(channelId);
+        } else if (type.equals(VoiceChannel.class)) {
+            return (T) guild.getVoiceChannelById(channelId);
+        } else {
+            return (T) guild.getGuildChannelById(channelId);
         }
-
-        return switch (channel) {
-            case TextChannel t -> (TextChannel) channel;
-            case VoiceChannel v -> (VoiceChannel) channel;
-            default -> channel;
-        };
     }
 
     /**
@@ -83,10 +84,25 @@ public class IdResolver {
      * @param channelKeyword In the .env-file defined channel keyword
      * @return Role object
      */
-    public static GuildChannel getChannelById(String guildKeyword, String channelKeyword) {
+    public static <T> T getChannelById(Class<T> type, String guildKeyword, String channelKeyword) {
         long guildId = checkAndResolve(guildKeyword, Long.class);
         long channelId = checkAndResolve(channelKeyword, Long.class);
-        return getChannelById(guildId, channelId);
+        return getChannelById(type, guildId, channelId);
+    }
+
+    public static CompletableFuture<Message> getMessageById(long guildId, long channelId, long messageId) {
+        MessageChannel channel = getChannelById(TextChannel.class, guildId, channelId);
+        if (channel == null) {
+            log.error("Channel {} nicht gefunden!", channelId);
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Channel not found"));
+        }
+        return channel.retrieveMessageById(messageId)
+                .submit()  // ✅ führt die Action aus und gibt CompletableFuture zurück
+                .whenComplete((message, error) -> {
+                    if (error != null) {
+                        log.error("retrieveMessageById fehlgeschlagen: {}", error.getMessage());
+                    }
+                });
     }
 
     /**
@@ -99,6 +115,7 @@ public class IdResolver {
         if (Objects.equals(keyword, "")) {
             throw new IllegalArgumentException("Illegal keyword");
         }
+        log.error(keyword);
         String value = Client.getInstance().getConfig().get(keyword);
 
         if (Objects.equals(value, "")) throw new IllegalStateException("Keyword is null");

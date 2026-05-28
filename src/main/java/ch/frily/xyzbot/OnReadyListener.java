@@ -1,6 +1,8 @@
 package ch.frily.xyzbot;
 
+import ch.frily.xyzbot.utils.IdResolver;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -19,9 +21,12 @@ public class OnReadyListener extends ListenerAdapter {
 
     @Override
     public void onGuildReady(GuildReadyEvent event) {
-        log.info("Loading members from {}.", event.getGuild().getName());
         event.getGuild().loadMembers().onSuccess(members -> {
-            log.debug("Loaded all members from {}: {}", event.getGuild().getName(), members.size());
+            log.info("Loaded members for guild '{}'.", event.getGuild().getName());
+            int cached = event.getGuild().getMembers().size();
+            int total  = event.getGuild().getMemberCount();
+
+            log.debug("{}: Cached members: {} / Total members: {}", event.getGuild(), cached, total);
         });
     }
 
