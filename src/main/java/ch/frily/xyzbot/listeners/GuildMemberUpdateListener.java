@@ -2,7 +2,8 @@ package ch.frily.xyzbot.listeners;
 
 import ch.frily.xyzbot.Client;
 import ch.frily.xyzbot.teamlist.Teamlist;
-import ch.frily.xyzbot.utils.IdResolver;
+import ch.frily.xyzbot.utils.EnvKey;
+import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -32,10 +33,10 @@ public class GuildMemberUpdateListener extends ListenerAdapter {
         ActionRow components = ActionRow.of(
                 Button.link("https://discord.com/channels/719211950269005857/737440736529875035", "Bewerben"),
                 Button.link(Client.getInstance().getConfig().get("DOCMOST_AUFBAUORGA"), "Aufbauorganisation"));
-        TextChannel channel = (TextChannel) IdResolver.getChannelById(TextChannel.class, "GUILD_XYZCRAFT", "CHANNEL_TEAMLIST");
+        TextChannel channel = (TextChannel) EnvResolver.getChannelById(TextChannel.class, EnvKey.GUILD_XYZCRAFT, EnvKey.CHANNEL_DASTEAM);
 
 
-        IdResolver.getMessageById(event.getGuild().getIdLong(), channel.getIdLong(), channel.getLatestMessageIdLong()).thenAccept(message -> {
+        EnvResolver.getMessageById(event.getGuild().getIdLong(), channel.getIdLong(), channel.getLatestMessageIdLong()).thenAccept(message -> {
             message.editMessageEmbeds(embed).queue();
         }).exceptionally(error -> {
             channel.sendMessage("").addEmbeds(embed).addComponents(components).queue();

@@ -5,15 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.Channel;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
-import javax.naming.InvalidNameException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  * Resolve Discord related IDs
  */
 @Slf4j
-public class IdResolver {
+public class EnvResolver {
 
     /**
      * Get a Guild by its integer ID
@@ -37,7 +32,7 @@ public class IdResolver {
      * @param keyword In the .env-file defined keyword
      * @return Guild object
      */
-    public static Guild getGuildById(String keyword) {
+    public static Guild getGuildById(EnvKey keyword) {
         long guildId = checkAndResolve(keyword, Long.class);
         return getGuildById(guildId);
     }
@@ -56,7 +51,7 @@ public class IdResolver {
      * @param keyword In the .env-file defined keyword
      * @return Channel object
      */
-    public static Role getRoleById(String keyword) {
+    public static Role getRoleById(EnvKey keyword) {
         long roleId = checkAndResolve(keyword, Long.class);
         return getRoleById(roleId);
     }
@@ -84,7 +79,7 @@ public class IdResolver {
      * @param channelKeyword In the .env-file defined channel keyword
      * @return Role object
      */
-    public static <T> T getChannelById(Class<T> type, String guildKeyword, String channelKeyword) {
+    public static <T> T getChannelById(Class<T> type, EnvKey guildKeyword, EnvKey channelKeyword) {
         long guildId = checkAndResolve(guildKeyword, Long.class);
         long channelId = checkAndResolve(channelKeyword, Long.class);
         return getChannelById(type, guildId, channelId);
@@ -111,12 +106,12 @@ public class IdResolver {
      * @return Resolved value
      * @param <T> Returntype of the resolved value
      */
-    private static <T> T checkAndResolve(String keyword, Class<T> type) {
+    private static <T> T checkAndResolve(EnvKey keyword, Class<T> type) {
         if (Objects.equals(keyword, "")) {
             throw new IllegalArgumentException("Illegal keyword");
         }
-        log.error(keyword);
-        String value = Client.getInstance().getConfig().get(keyword);
+        log.error(keyword.name());
+        String value = Client.getInstance().getConfig().get(keyword.name());
 
         if (Objects.equals(value, "") || value == null) throw new IllegalStateException("Keyword is null");
         if (type == String.class) return type.cast(value);

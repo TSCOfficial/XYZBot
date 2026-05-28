@@ -1,17 +1,14 @@
 package ch.frily.xyzbot.teamlist;
 
-import ch.frily.xyzbot.Client;
-import ch.frily.xyzbot.utils.IdResolver;
+import ch.frily.xyzbot.utils.EnvKey;
+import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.utils.concurrent.Task;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -20,16 +17,16 @@ public class Teamlist {
 
     private static Teamlist instance;
 
-    private static final List<String> ROLE_KEYWORDS = List.of(
-            "ROLE_LEITUNG",
-            "ROLE_ENTWICKLUNG",
-            "ROLE_PROBEENTWICKLUNG",
-            "ROLE_MODERATION",
-            "ROLE_SUPPORT",
-            "ROLE_PROBESUPPORT",
-            "ROLE_BAUTRUPP",
-            "ROLE_PROBEBAUTRUPP",
-            "ROLE_GESTALTUNG"
+    private static final List<EnvKey> ROLE_KEYWORDS = List.of(
+            EnvKey.ROLE_LEITUNG,
+            EnvKey.ROLE_ENTWICKLUNG,
+            EnvKey.ROLE_PROBEENTWICKLUNG,
+            EnvKey.ROLE_MODERATION,
+            EnvKey.ROLE_SUPPORT,
+            EnvKey.ROLE_PROBESUPPORT,
+            EnvKey.ROLE_BAUTRUPP,
+            EnvKey.ROLE_PROBEBAUTRUPP,
+            EnvKey.ROLE_GESTALTUNG
     );
 
     private static final Pattern ROLE_NAME_PATTERN = Pattern.compile("[^\\p{L}\\p{N}\\-\\s]");
@@ -45,7 +42,7 @@ public class Teamlist {
      * Generate all the Fields sing the role keyword list
      */
     public MessageEmbed generateEmbed() {
-        List<Role> roles = ROLE_KEYWORDS.stream().map(IdResolver::getRoleById).toList();
+        List<Role> roles = ROLE_KEYWORDS.stream().map(EnvResolver::getRoleById).toList();
         List<MessageEmbed.Field> fields = roles.stream().map(this::generateFieldByRole).toList();
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("XYZCraft Team");
@@ -54,7 +51,7 @@ public class Teamlist {
         embedBuilder.setColor(new Color(46, 204, 113));
         fillWithBlankFields(embedBuilder);
 
-        List<Member> teammembers = getUsersByRole(IdResolver.getRoleById("ROLE_TEAM"));
+        List<Member> teammembers = getUsersByRole(EnvResolver.getRoleById(EnvKey.ROLE_TEAM));
         embedBuilder.addField("Gesammtes Team (" + teammembers.size() + ")",
                                 teammembers.stream().map(Member::getAsMention).collect(Collectors.joining(", ")), false);
 
@@ -99,7 +96,7 @@ public class Teamlist {
      * @return true | false : Returns true when the list is completed
      */
     private List<Member> getUsersByRole(Role role) {
-        Guild guild = IdResolver.getGuildById("GUILD_XYZCRAFT");
+        Guild guild = EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT);
         return guild.getMembersWithRoles(role);
     }
 

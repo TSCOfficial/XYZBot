@@ -3,18 +3,16 @@ package ch.frily.xyzbot.slashcommands;
 import ch.frily.xyzbot.Client;
 import ch.frily.xyzbot.find.FindCmd;
 import ch.frily.xyzbot.teamlist.TeamlistCmd;
-import ch.frily.xyzbot.utils.IdResolver;
+import ch.frily.xyzbot.utils.EnvKey;
+import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 public class SlashCommandManager {
@@ -74,7 +72,7 @@ public class SlashCommandManager {
                 slashCommandData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions()));
             }
 
-            IdResolver.getGuildById("GUILD_XYZCRAFT").upsertCommand(slashCommandData).queue();
+            EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT).upsertCommand(slashCommandData).queue();
             log.info("Slashcommand: " + command.getName());
 
         }
