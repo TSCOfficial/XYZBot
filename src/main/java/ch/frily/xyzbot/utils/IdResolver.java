@@ -118,7 +118,7 @@ public class IdResolver {
         log.error(keyword);
         String value = Client.getInstance().getConfig().get(keyword);
 
-        if (Objects.equals(value, "")) throw new IllegalStateException("Keyword is null");
+        if (Objects.equals(value, "") || value == null) throw new IllegalStateException("Keyword is null");
         if (type == String.class) return type.cast(value);
         if (type == Integer.class) return type.cast(Integer.parseInt(value));
         if (type == Long.class)    return type.cast(Long.parseLong(value));

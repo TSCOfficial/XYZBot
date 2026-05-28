@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.slashcommands;
 
 import ch.frily.xyzbot.Client;
+import ch.frily.xyzbot.teamlist.TeamlistCmd;
 import ch.frily.xyzbot.utils.IdResolver;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +38,9 @@ public class SlashCommandManager {
      * Load all slash commands
      */
     public void loadCommands() {
-        Reflections reflections = new Reflections("ch.frily.xyzbot.slashcommands.cmds");
-
-        Set<Class<? extends ISlashCommand>> commandClasses = reflections.getSubTypesOf(ISlashCommand.class);
-
-        for (Class<? extends ISlashCommand> commandClass : commandClasses) {
-            try {
-                slashCommands.add(commandClass.getDeclaredConstructor().newInstance());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        slashCommands.addAll(List.of(
+                new TeamlistCmd()
+        ));
         updateDiscordCommands();
     }
 
