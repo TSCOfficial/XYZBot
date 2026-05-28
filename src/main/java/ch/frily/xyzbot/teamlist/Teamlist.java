@@ -50,7 +50,7 @@ public class Teamlist {
         List<Role> roles = ROLE_KEYWORDS.stream().map(IdResolver::getRoleById).toList();
         List<MessageEmbed.Field> fields = roles.stream().map(this::generateFieldByRole).toList();
 
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("XYXCraft Team");
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("XYZCraft Team");
         fields.forEach(embedBuilder::addField);
         embedBuilder.setFooter("Zuletzt aktualisiert am");
         embedBuilder.setTimestamp(new Date().toInstant());
