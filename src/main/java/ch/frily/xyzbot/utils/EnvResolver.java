@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -98,6 +99,11 @@ public class EnvResolver {
                         log.error("retrieveMessageById fehlgeschlagen: {}", error.getMessage());
                     }
                 });
+    }
+
+    public static Category getCategoryById(EnvKey categoryKeyword) {
+        long categoryId = checkAndResolve(categoryKeyword, Long.class);
+        return Client.getInstance().getClient().getCategoryById(categoryId);
     }
 
     /**

@@ -14,5 +14,7 @@ public enum EnvKey {
     ROLE_GESTALTUNG,
     ROLE_TEAM,
     CHANNEL_DASTEAM,
-    URL_AUFBAUORGANISATION
+    CATEGORY_TICKETS,
+    URL_AUFBAUORGANISATION,
 }
+// todo evntl sogar funktional? dass die enum elemente vars sind welche den .env-aufruf automatisch machen und den wert direkt ausgeben?
