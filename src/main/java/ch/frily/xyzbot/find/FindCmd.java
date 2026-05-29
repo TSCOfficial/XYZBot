@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FindCmd implements ISlashCommand {
+
     @Override
     public String getName() {
         return "find";

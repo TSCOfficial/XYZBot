@@ -26,27 +26,33 @@ public interface ISlashCommand {
     String getDescription();
 
     /**
+     * Execute a slashcommand by its interaction event.<br>
+     * @param event The {@link SlashCommandInteractionEvent}
+     */
+    void execute(@NotNull SlashCommandInteractionEvent event);
+
+    /**
      * Get the options and choices of a slashcommand.
      *
      * @return a {@link List} of {@link OptionData}.
      */
-    List<OptionData> getOptions();
+    default List<OptionData> getOptions() {
+        return List.of();
+    };
 
     /**
      * Get the autocompletion of a slashcommand.
      * @return a {@link Map} of a {@link String} & a {@link List}.
      */
-    Map<String, List<?>> getAutocomplete();
+    default Map<String, List<?>> getAutocomplete() {
+        return Map.of();
+    };
 
     /**
      * Get the default permissions of a slashcommand
      * @return a list of {@link Permission}
      */
-    List<Permission> getDefaultPermissions();
-
-    /**
-     * Execute a slashcommand by its interaction event.<br>
-     * @param event The {@link SlashCommandInteractionEvent}
-     */
-    void execute(@NotNull SlashCommandInteractionEvent event);
+    default List<Permission> getDefaultPermissions() {
+        return List.of();
+    }
 }

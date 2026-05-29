@@ -7,9 +7,11 @@ import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class SlashCommandManager {
     }
 
     /**
-     * Load all slash commands
+     * Load all slash single commands and command-groups
      */
     public void loadCommands() {
         slashCommands.addAll(List.of(
@@ -62,19 +64,24 @@ public class SlashCommandManager {
 //            return null;
 //        });
 
-
         for (ISlashCommand command : slashCommands) {
-            SlashCommandData slashCommandData = Commands.slash(command.getName(), command.getDescription());
+
+            SlashCommandData slashCommand = Commands.slash(command.getName(), command.getDescription());
+
+            if (command instanceof ISlashCommandGroup) {
+
+            }
+
+
             if (!command.getOptions().isEmpty()) {
-                slashCommandData.addOptions(command.getOptions());
+                slashCommand.addOptions(command.getOptions());
             }
             if (!command.getDefaultPermissions().isEmpty()) {
-                slashCommandData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions()));
+                slashCommand.setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getDefaultPermissions()));
             }
 
-            EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT).upsertCommand(slashCommandData).queue();
+            EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT).upsertCommand(slashCommand).queue();
             log.info("Slashcommand: " + command.getName());
-
         }
     }
 
