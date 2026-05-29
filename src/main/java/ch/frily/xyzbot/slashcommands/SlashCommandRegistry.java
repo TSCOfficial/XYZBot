@@ -111,7 +111,6 @@ public class SlashCommandRegistry {
      * @param event
      */
     public void dispatchInteractionEvent(SlashCommandInteractionEvent event) throws NotFoundException {
-        String subName = event.getSubcommandName();
         commands.putAll(subcommands);
 
         ISlashCommand command = commands.get(event.getFullCommandName());
