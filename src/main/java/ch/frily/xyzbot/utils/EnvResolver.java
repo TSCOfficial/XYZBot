@@ -119,6 +119,8 @@ public class EnvResolver {
         log.error(keyword.name());
         String value = Client.getInstance().getConfig().get(keyword.name());
 
+        log.debug(value);
+
         if (Objects.equals(value, "") || value == null) throw new IllegalStateException("Keyword is null");
         if (type == String.class) return type.cast(value);
         if (type == Integer.class) return type.cast(Integer.parseInt(value));

@@ -1,7 +1,8 @@
 package ch.frily.xyzbot.listeners;
 
 import ch.frily.xyzbot.slashcommands.ISlashCommand;
-import ch.frily.xyzbot.slashcommands.SlashCommandManager;
+import ch.frily.xyzbot.slashcommands.SlashCommandRegistry;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -31,12 +32,10 @@ public class InteractionListener extends ListenerAdapter {
      */
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        log.debug("Slashinteraction");
-        for (ISlashCommand command : SlashCommandManager.getInstance().getSlashCommands()){
-            if (command.getName().equals(event.getName())){
-                command.execute(event);
-                return;
-            }
+        try {
+            SlashCommandRegistry.getInstance().dispatchInteractionEvent(event);
+        } catch (NotFoundException notFoundException) {
+            event.reply(notFoundException.getMessage()).setEphemeral(true).queue();
         }
     }
 
@@ -46,29 +45,6 @@ public class InteractionListener extends ListenerAdapter {
      */
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        for (ISlashCommand command : SlashCommandManager.getInstance().getSlashCommands()) {
-            if (command.getName().equals(event.getName())) {
-                String focusedOptionName = event.getFocusedOption().getName();
-                List<?> choices = command.getAutocomplete().getOrDefault(focusedOptionName, List.of());
-
-                List<Command.Choice> options = choices.stream()
-                        .filter(
-                                choice -> choice.toString().startsWith(event.getFocusedOption().getValue()))
-                        .map(choice -> {
-                            if (choice instanceof String) {
-                                return new Command.Choice((String) choice, (String) choice);
-                            } else if (choice instanceof Integer) {
-                                return new Command.Choice(choice.toString(), (Integer) choice);
-                            } else if (choice instanceof Double) {
-                                return new Command.Choice(choice.toString(), (Double) choice);
-                            }
-                            return null;
-                        })
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
-
-                event.replyChoices(options).queue();
-            }
-        }
+        SlashCommandRegistry.getInstance().dispatchAutocompleteEvent(event);
     }
 }

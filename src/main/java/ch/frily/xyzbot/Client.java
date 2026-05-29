@@ -3,7 +3,6 @@ package ch.frily.xyzbot;
 import ch.frily.xyzbot.listeners.InteractionListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
-import ch.frily.xyzbot.slashcommands.SlashCommandManager;
 import ch.frily.xyzbot.slashcommands.SlashCommandRegistry;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -52,11 +51,9 @@ public class Client {
             log.info("Application started successfully!");
 
             // Load/start stuff
-            SlashCommandManager.getInstance().loadCommands();
 
-            SlashCommandRegistry registry = new SlashCommandRegistry();
-            registry.loadCommands();
-            registry.registerAll();
+            SlashCommandRegistry.getInstance().loadCommands();
+            SlashCommandRegistry.getInstance().registerAll();
 
         } catch (InterruptedException e) {
             log.error(e.getMessage());

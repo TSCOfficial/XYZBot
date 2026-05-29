@@ -7,26 +7,36 @@ import ch.frily.xyzbot.ticketsystem.Ticket;
 import ch.frily.xyzbot.ticketsystem.TicketCmdGroup;
 import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SlashCommandRegistry {
 
+    private static SlashCommandRegistry instance;
+
     private final Map<String, ISlashCommand> commands = new HashMap<>();
     private final List<ISlashCommandGroup> groups = new ArrayList<>();
     private final Map<String, ISlashSubcommand> subcommands = new HashMap<>();
+
+    public static SlashCommandRegistry getInstance() {
+        if (instance == null) {
+            instance = new SlashCommandRegistry();
+        }
+        return instance;
+    }
 
     public void loadCommands() {
         List<ISlashCommand> slashCommands = List.of(
@@ -82,34 +92,58 @@ public class SlashCommandRegistry {
     }
 
     private SlashCommandData buildGroup(ISlashCommandGroup group) {
-        SlashCommandData SlashCommand = Commands.slash(group.getName(), "no-description-set");
+        SlashCommandData slashCommand = Commands.slash(group.getName(), "no-description-set");
         if (!group.getDefaultPermissions().isEmpty())
-            SlashCommand.setDefaultPermissions(DefaultMemberPermissions.enabledFor(group.getDefaultPermissions()));
+            slashCommand.setDefaultPermissions(DefaultMemberPermissions.enabledFor(group.getDefaultPermissions()));
 
         group.getSubcommands().forEach(sub -> {
             log.debug(sub.getName());
             SubcommandData subData = new SubcommandData(sub.getName(), sub.getDescription());
             if (!sub.getOptions().isEmpty()) subData.addOptions(sub.getOptions());
-            SlashCommand.addSubcommands(subData);
+            slashCommand.addSubcommands(subData);
         });
 
-        return SlashCommand;
+        return slashCommand;
     }
 
     /**
      * Dispatch the event from an eventlistener to the appropriate interaction executor
      * @param event
      */
-    public void dispatchInteractionEvent(SlashCommandInteractionEvent event) {
+    public void dispatchInteractionEvent(SlashCommandInteractionEvent event) throws NotFoundException {
         String subName = event.getSubcommandName();
+        commands.putAll(subcommands);
 
-        if (subName != null) {
-            // Subcommand: "group/subcommand"
-            ISlashSubcommand command = subcommands.get(event.getName() + " " + subName);
-            if (command != null) command.execute(event);
-        } else {
-            ISlashCommand command = commands.get(event.getName());
-            if (command != null) command.execute(event);
+        ISlashCommand command = commands.get(event.getFullCommandName());
+
+        if (command == null) {
+            throw new NotFoundException("Slashcommand " + event.getFullCommandName() + " could not be found.");
         }
+
+        command.execute(event);
+    }
+
+    public void dispatchAutocompleteEvent(CommandAutoCompleteInteractionEvent event) {
+        ISlashCommand command = commands.get(event.getFullCommandName());
+        String focusedOptionName = event.getFocusedOption().getName();
+        List<?> choices = command.getAutocomplete().getOrDefault(focusedOptionName, List.of());
+
+        List<Command.Choice> options = choices.stream()
+                .filter(
+                        choice -> choice.toString().startsWith(event.getFocusedOption().getValue()))
+                .map(choice -> {
+                    if (choice instanceof String) {
+                        return new Command.Choice((String) choice, (String) choice);
+                    } else if (choice instanceof Integer) {
+                        return new Command.Choice(choice.toString(), (Integer) choice);
+                    } else if (choice instanceof Double) {
+                        return new Command.Choice(choice.toString(), (Double) choice);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        event.replyChoices(options).queue();
     }
 }
