@@ -24,5 +24,6 @@ public class PanelManager {
         Arrays.stream(TicketType.values()).map(type -> {
             return embed.addField(type.getLabel(), type.getDescription(), false);
         });
+        return embed.build();
     }
 }

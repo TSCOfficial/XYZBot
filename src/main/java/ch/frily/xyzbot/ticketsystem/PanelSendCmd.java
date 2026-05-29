@@ -12,19 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 public class PanelSendCmd implements ISlashSubcommand {
-    @Override
-    public ISlashCommandGroup getGroup() {
-        return null;
-    }
 
     @Override
     public String getName() {
-        return "";
+        return "panel";
     }
 
     @Override
     public String getDescription() {
-        return "";
+        return "Sende panel";
     }
 
     @Override

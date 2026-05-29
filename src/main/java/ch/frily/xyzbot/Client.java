@@ -4,6 +4,7 @@ import ch.frily.xyzbot.listeners.InteractionListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
 import ch.frily.xyzbot.slashcommands.SlashCommandManager;
+import ch.frily.xyzbot.slashcommands.SlashCommandRegistry;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,10 @@ public class Client {
 
             // Load/start stuff
             SlashCommandManager.getInstance().loadCommands();
+
+            SlashCommandRegistry registry = new SlashCommandRegistry();
+            registry.loadCommands();
+            registry.registerAll();
 
         } catch (InterruptedException e) {
             log.error(e.getMessage());

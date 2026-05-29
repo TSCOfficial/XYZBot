@@ -3,6 +3,8 @@ package ch.frily.xyzbot.slashcommands;
 import ch.frily.xyzbot.find.FindCmd;
 import ch.frily.xyzbot.teamlist.TeamlistCmd;
 import ch.frily.xyzbot.ticketsystem.PanelSendCmd;
+import ch.frily.xyzbot.ticketsystem.Ticket;
+import ch.frily.xyzbot.ticketsystem.TicketCmdGroup;
 import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +31,11 @@ public class SlashCommandRegistry {
     public void loadCommands() {
         List<ISlashCommand> slashCommands = List.of(
                 new FindCmd(),
-                new TeamlistCmd(),
-                new PanelSendCmd()
+                new TeamlistCmd()
         );
 
         List<ISlashCommandGroup> slashCommandGroups = List.of(
-
+            new TicketCmdGroup()
         );
 
         slashCommands.forEach(cmd -> {
@@ -44,7 +45,7 @@ public class SlashCommandRegistry {
         slashCommandGroups.forEach(group -> {
             groups.add(group);
             group.getSubcommands().forEach(cmd -> {
-                subcommands.put(cmd.getGroup().getName() + " " + cmd.getName(), cmd);
+                subcommands.put(group.getName() + " " + cmd.getName(), cmd);
             });
 
         });
@@ -81,11 +82,12 @@ public class SlashCommandRegistry {
     }
 
     private SlashCommandData buildGroup(ISlashCommandGroup group) {
-        SlashCommandData SlashCommand = Commands.slash(group.getName(), group.getDescription());
+        SlashCommandData SlashCommand = Commands.slash(group.getName(), "no-description-set");
         if (!group.getDefaultPermissions().isEmpty())
             SlashCommand.setDefaultPermissions(DefaultMemberPermissions.enabledFor(group.getDefaultPermissions()));
 
         group.getSubcommands().forEach(sub -> {
+            log.debug(sub.getName());
             SubcommandData subData = new SubcommandData(sub.getName(), sub.getDescription());
             if (!sub.getOptions().isEmpty()) subData.addOptions(sub.getOptions());
             SlashCommand.addSubcommands(subData);

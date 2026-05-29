@@ -7,11 +7,13 @@ import net.dv8tion.jda.api.entities.Member;
 import java.util.List;
 import java.util.Map;
 
-public interface ISlashCommandGroup extends ISlashCommand {
+public interface ISlashCommandGroup {
 
     String getName();
 
-    List<Permission> getDefaultPermissions();
+    default List<Permission> getDefaultPermissions() {
+        return List.of();
+    }
 
     //Map<IPermissionHolder, List<Permission>> getOverwritePermissions();
 
