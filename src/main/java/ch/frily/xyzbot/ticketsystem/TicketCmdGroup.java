@@ -1,8 +1,7 @@
 package ch.frily.xyzbot.ticketsystem;
 
-import ch.frily.xyzbot.slashcommands.ISlashCommandGroup;
-import ch.frily.xyzbot.slashcommands.ISlashSubcommand;
-import net.dv8tion.jda.api.Permission;
+import ch.frily.xyzbot.interactions.slashcommands.ISlashCommandGroup;
+import ch.frily.xyzbot.interactions.slashcommands.ISlashSubcommand;
 
 import java.util.List;
 

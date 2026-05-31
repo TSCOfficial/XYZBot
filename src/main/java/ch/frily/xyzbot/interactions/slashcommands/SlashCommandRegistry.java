@@ -1,9 +1,7 @@
-package ch.frily.xyzbot.slashcommands;
+package ch.frily.xyzbot.interactions.slashcommands;
 
 import ch.frily.xyzbot.find.FindCmd;
 import ch.frily.xyzbot.teamlist.TeamlistCmd;
-import ch.frily.xyzbot.ticketsystem.PanelSendCmd;
-import ch.frily.xyzbot.ticketsystem.Ticket;
 import ch.frily.xyzbot.ticketsystem.TicketCmdGroup;
 import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
@@ -27,8 +25,10 @@ public class SlashCommandRegistry {
 
     private static SlashCommandRegistry instance;
 
+    // name, SlashCommand
     private final Map<String, ISlashCommand> commands = new HashMap<>();
     private final List<ISlashCommandGroup> groups = new ArrayList<>();
+    // group-subname, Slashcommand
     private final Map<String, ISlashSubcommand> subcommands = new HashMap<>();
 
     public static SlashCommandRegistry getInstance() {

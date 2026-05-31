@@ -1,9 +1,8 @@
 package ch.frily.xyzbot.find;
 
-import ch.frily.xyzbot.slashcommands.ISlashCommand;
+import ch.frily.xyzbot.interactions.slashcommands.ISlashCommand;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

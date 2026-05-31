@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.teamlist;
 
 import ch.frily.xyzbot.Client;
-import ch.frily.xyzbot.slashcommands.ISlashCommand;
+import ch.frily.xyzbot.interactions.slashcommands.ISlashCommand;
 import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;

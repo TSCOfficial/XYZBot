@@ -1,9 +1,10 @@
 package ch.frily.xyzbot;
 
+import ch.frily.xyzbot.interactions.button.ButtonRegistry;
 import ch.frily.xyzbot.listeners.InteractionListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
-import ch.frily.xyzbot.slashcommands.SlashCommandRegistry;
+import ch.frily.xyzbot.interactions.slashcommands.SlashCommandRegistry;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,7 @@ public class Client {
 
             SlashCommandRegistry.getInstance().loadCommands();
             SlashCommandRegistry.getInstance().registerAll();
+            ButtonRegistry.getInstance().loadButtons();
 
         } catch (InterruptedException e) {
             log.error(e.getMessage());

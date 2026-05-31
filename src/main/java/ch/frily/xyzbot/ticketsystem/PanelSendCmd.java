@@ -1,9 +1,13 @@
 package ch.frily.xyzbot.ticketsystem;
 
-import ch.frily.xyzbot.slashcommands.ISlashCommand;
-import ch.frily.xyzbot.slashcommands.ISlashCommandGroup;
-import ch.frily.xyzbot.slashcommands.ISlashSubcommand;
+import ch.frily.xyzbot.Client;
+import ch.frily.xyzbot.interactions.slashcommands.ISlashSubcommand;
+import ch.frily.xyzbot.utils.EnvKey;
+import javassist.NotFoundException;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +44,21 @@ public class PanelSendCmd implements ISlashSubcommand {
 
     @Override
     public void execute(@NotNull SlashCommandInteractionEvent event) {
+        try {
+            MessageEmbed embed = new PanelEmbed().build();
+            TextChannel channel = event.getGuild().getTextChannelById(Client.getInstance().getConfig().get(EnvKey.CHANNEL_TICKET.name()));
 
+            if (channel == null) {
+                throw new NotFoundException("Channel not found");
+            }
+            ActionRow actionrow = ActionRow.of(
+                    SupportButton.getInstance().build()
+            );
+            channel.sendMessageEmbeds(embed).setComponents(actionrow).queue();
+            event.reply("✅ Panel erfolgreich gesendet.").setEphemeral(true).queue();
+
+        } catch (NotFoundException notFoundException) {
+            event.reply(notFoundException.getMessage()).setEphemeral(true).queue();
+        }
     }
 }
