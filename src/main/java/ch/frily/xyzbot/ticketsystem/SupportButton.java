@@ -33,6 +33,7 @@ public class SupportButton implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        event.reply("Interacted").setEphemeral(true).queue();
+        // Show modal to select further
+        event.reply("*Interaction received. Feature incomplete.*").setEphemeral(true).queue();
     }
 }
