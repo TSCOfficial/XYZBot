@@ -4,7 +4,7 @@ import ch.frily.xyzbot.interactions.button.ButtonRegistry;
 import ch.frily.xyzbot.listeners.InteractionListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
-import ch.frily.xyzbot.interactions.slashcommands.SlashCommandRegistry;
+import ch.frily.xyzbot.interactions.slashcommand.SlashCommandRegistry;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

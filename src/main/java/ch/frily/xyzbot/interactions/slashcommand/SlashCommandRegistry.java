@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.interactions.slashcommands;
+package ch.frily.xyzbot.interactions.slashcommand;
 
 import ch.frily.xyzbot.find.FindCmd;
 import ch.frily.xyzbot.teamlist.TeamlistCmd;

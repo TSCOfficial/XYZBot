@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.listeners;
 
 import ch.frily.xyzbot.interactions.button.ButtonRegistry;
-import ch.frily.xyzbot.interactions.slashcommands.SlashCommandRegistry;
+import ch.frily.xyzbot.interactions.slashcommand.SlashCommandRegistry;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
