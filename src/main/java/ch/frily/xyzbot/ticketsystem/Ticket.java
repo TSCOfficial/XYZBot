@@ -37,10 +37,4 @@ public class Ticket {
     // When the last message was sent
     @Getter
     private LocalDateTime lastActivityAt;
-
-    public String getTicketName(){
-        String type = this.getType().getId();
-        String username = this.getOwner().getEffectiveName();
-        return type + "-" + username;
-    }
 }

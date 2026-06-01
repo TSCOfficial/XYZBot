@@ -16,7 +16,12 @@ public enum TicketTypeGroup {
             "Bewerbung als Dev"),
     LEITUNG(
             "Leitung",
-            "Probleme die der Support ned lösen kann");
+            """
+                    Bitte nutze dieses Ticket nur, wenn:
+                    - Dein Anliegen über die Möglichkeiten des Supports hinausgeht.
+                    - Es sich um ein vertrauliches oder sensibles Thema handelt.
+                    - Du bereits ein Support-Ticket hattest, das nicht gelöst wurde.
+                    """);
 
     @Getter
     private final String label;

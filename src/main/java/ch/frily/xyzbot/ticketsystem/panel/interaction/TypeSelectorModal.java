@@ -1,22 +1,20 @@
 package ch.frily.xyzbot.ticketsystem.panel.interaction;
 
 import ch.frily.xyzbot.interactions.modal.IModal;
+import ch.frily.xyzbot.ticketsystem.TicketController;
 import ch.frily.xyzbot.ticketsystem.TicketType;
 import ch.frily.xyzbot.ticketsystem.TicketTypeGroup;
-import lombok.Getter;
 import lombok.Setter;
-import net.dv8tion.jda.api.components.ModalTopLevelComponent;
-import net.dv8tion.jda.api.components.label.Label;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.label.LabelChildComponent;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 public class TypeSelectorModal implements IModal {
 
     @Setter
@@ -39,7 +37,7 @@ public class TypeSelectorModal implements IModal {
 
         StringSelectMenu.Builder selectMenuBuilder = StringSelectMenu.create("select-menu:ticket-type-selector");
         types.forEach(type -> {
-            selectMenuBuilder.addOption(type.getLabel(), type.getId(), type.getDescription());
+            selectMenuBuilder.addOption(type.getLabel(), type.getId(), type.getSelectDescription());
         });
         selectMenuBuilder.setMinValues(1);
         selectMenuBuilder.setMaxValues(1);
@@ -52,6 +50,17 @@ public class TypeSelectorModal implements IModal {
 
     @Override
     public void execute(@NotNull ModalInteractionEvent event) {
-        event.reply("Creating Ticket").setEphemeral(true).queue();
+        try {
+            log.debug(event.getModalId());
+            log.debug(event.getValue("select-menu:ticket-type-selector").getAsStringList().getFirst());
+            TicketType ticketType = Arrays.stream(TicketType.values()).filter(type ->
+                    Objects.equals(type.getId(), event.getValue("select-menu:ticket-type-selector").getAsStringList().getFirst())
+            ).findFirst().orElseThrow(() -> new IllegalStateException("Tickettyp ist ungültig."));
+
+            TicketController.getInstance().createTicket(ticketType, event.getMember());
+            // todo event.reply() mit #ticket erwähnung
+        } catch (PermissionException permissionException) {
+            event.reply(permissionException.getMessage()).setEphemeral(true).queue();
+        }
     }
 }

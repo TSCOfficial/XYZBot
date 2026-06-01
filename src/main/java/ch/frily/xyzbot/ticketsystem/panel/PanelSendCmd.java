@@ -2,6 +2,8 @@ package ch.frily.xyzbot.ticketsystem.panel;
 
 import ch.frily.xyzbot.Client;
 import ch.frily.xyzbot.interactions.slashcommand.ISlashSubcommand;
+import ch.frily.xyzbot.ticketsystem.panel.interaction.BewerbungButton;
+import ch.frily.xyzbot.ticketsystem.panel.interaction.LeitungButton;
 import ch.frily.xyzbot.ticketsystem.panel.interaction.SupportButton;
 import ch.frily.xyzbot.utils.EnvKey;
 import javassist.NotFoundException;
@@ -53,7 +55,9 @@ public class PanelSendCmd implements ISlashSubcommand {
                 throw new NotFoundException("Channel not found");
             }
             ActionRow actionrow = ActionRow.of(
-                    SupportButton.getInstance().build()
+                    SupportButton.getInstance().build(),
+                    BewerbungButton.getInstance().build(),
+                    LeitungButton.getInstance().build()
             );
             channel.sendMessageEmbeds(embed).setComponents(actionrow).queue();
             event.reply("✅ Panel erfolgreich gesendet.").setEphemeral(true).queue();

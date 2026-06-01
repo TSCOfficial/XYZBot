@@ -5,15 +5,17 @@ import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import java.awt.*;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class TicketController {
@@ -29,33 +31,58 @@ public class TicketController {
         return instance;
     }
 
-    public void createTicket(Ticket ticket) {
+    public void createTicket(TicketType type, Member ticketOwner) {
+
+        // check if permitted: Bewerbung-support -> Has linked account with minecraft?
+        isPermitted(type, ticketOwner);
+
+        Ticket ticket = new Ticket();
+        ticket.setType(type);
+        ticket.setOwner(ticketOwner);
+
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
 
         // Ticket settings
-        ChannelAction<TextChannel> ticketCreation = ticketCategory.createTextChannel(ticket.getTicketName());
-        ticketCreation.addMemberPermissionOverride(ticket.getOwner().getIdLong(), ownerPermissions, null).queue();
-        ticketCreation.setTopic(ticket.getType().getLabel()).queue();
-
-        // Ticket content
-        ticketCreation.queue(textChannel -> {
-
-            textChannel.sendMessage(ticket.getOwner().getAsMention() + ticket.getType().getMentions())
-                    .addEmbeds(createEmbed(ticket)).queue();
+        ticketCategory.createTextChannel(generateTicketName(type, ticketOwner))
+                .addMemberPermissionOverride(ticketOwner.getIdLong(), ownerPermissions, null)
+                .setTopic(type.getLabel())
+                .queue(textChannel -> {
+                    // Ticket content
+                    ticket.setChannel(textChannel);
+                    textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getMentions().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
+                            .addEmbeds(createEmbed(ticket)).queue();
         });
     }
 
     private MessageEmbed createEmbed(Ticket ticket) {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle(ticket.getType().getLabel());
-        String description = "Willkommen " + ticket.getOwner().getAsMention() + "!" +
+        String description = "Willkommen **" + ticket.getOwner().getUser().getGlobalName() + "**!" +
                 "\n" +
-                ticket.getType().getDescription();
+                ticket.getType().getEmbedDescription();
         embed.setDescription(description);
-        embed.setFooter(ticket.getTicketName());
+        embed.setFooter(ticket.getChannel().getName());
         embed.setTimestamp(new Date().toInstant());
-        embed.setColor(new Color(46, 204, 113));
+        embed.setColor(ticket.getOwner().getColors().getPrimary());
         return embed.build();
+    }
+
+    private String generateTicketName(TicketType type, Member ticketOwner) {
+        String typeId = type.getId();
+        String username = ticketOwner.getUser().getGlobalName();
+        int randInt = ThreadLocalRandom.current().nextInt(100000, 999999);
+        return typeId + "-" + username  + "-" + randInt;
+    }
+
+    /**
+     * Check if the ticket owner is permitted or not
+     * @param ticketOwner
+     */
+    private void isPermitted(TicketType type, Member ticketOwner){
+        if (type == TicketType.BEWERBUNG_SUPPORT || type == TicketType.BEWERBUNG_EVENTTEAM) { // sup + event bewerbungen temporär gesperrt, bis das ganze System steht
+            throw new PermissionException("Du bist nicht berechtigt dies auszuführen");
+        }
+
     }
 
 }
