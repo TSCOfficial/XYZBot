@@ -1,7 +1,8 @@
-package ch.frily.xyzbot.ticketsystem;
+package ch.frily.xyzbot.ticketsystem.panel;
 
 import ch.frily.xyzbot.Client;
 import ch.frily.xyzbot.interactions.slashcommand.ISlashSubcommand;
+import ch.frily.xyzbot.ticketsystem.panel.interaction.SupportButton;
 import ch.frily.xyzbot.utils.EnvKey;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.Permission;

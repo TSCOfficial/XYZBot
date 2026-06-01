@@ -1,9 +1,11 @@
 package ch.frily.xyzbot.listeners;
 
 import ch.frily.xyzbot.interactions.button.ButtonRegistry;
+import ch.frily.xyzbot.interactions.modal.ModalRegistry;
 import ch.frily.xyzbot.interactions.slashcommand.SlashCommandRegistry;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -48,4 +50,11 @@ public class InteractionListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event){
         ButtonRegistry.getInstance().dispatchButtonInteraction(event);
     }
+
+    @Override
+    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+        ModalRegistry.getInstance().dispatchModalInteraction(event);
+    }
+
+
 }

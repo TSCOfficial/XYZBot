@@ -2,6 +2,7 @@ package ch.frily.xyzbot.ticketsystem;
 
 import ch.frily.xyzbot.interactions.slashcommand.ISlashCommandGroup;
 import ch.frily.xyzbot.interactions.slashcommand.ISlashSubcommand;
+import ch.frily.xyzbot.ticketsystem.panel.PanelSendCmd;
 
 import java.util.List;
 

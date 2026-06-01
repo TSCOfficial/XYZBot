@@ -1,8 +1,7 @@
 package ch.frily.xyzbot.interactions.button;
 
-import ch.frily.xyzbot.ticketsystem.SupportButton;
+import ch.frily.xyzbot.ticketsystem.panel.interaction.SupportButton;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
@@ -26,15 +25,15 @@ public class ButtonRegistry {
     }
 
     public void loadButtons() {
-        List<IButton> buttons = List.of(
+        List<IButton> rawButtons = List.of(
                 new SupportButton()
         );
-        buttons.forEach(btn -> {
+        rawButtons.forEach(btn -> {
             String idOrUrl = btn.getId();
             if (btn.getStyle() == ButtonStyle.LINK && btn.getUrl() != null) {
                 idOrUrl = btn.getUrl();
             }
-            this.buttons.put(idOrUrl, btn);
+            buttons.put(idOrUrl, btn);
         });
     }
 

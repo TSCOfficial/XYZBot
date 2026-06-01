@@ -1,6 +1,7 @@
 package ch.frily.xyzbot;
 
 import ch.frily.xyzbot.interactions.button.ButtonRegistry;
+import ch.frily.xyzbot.interactions.modal.ModalRegistry;
 import ch.frily.xyzbot.listeners.InteractionListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
@@ -56,6 +57,7 @@ public class Client {
             SlashCommandRegistry.getInstance().loadCommands();
             SlashCommandRegistry.getInstance().registerAll();
             ButtonRegistry.getInstance().loadButtons();
+            ModalRegistry.getInstance().loadModals();
 
         } catch (InterruptedException e) {
             log.error(e.getMessage());

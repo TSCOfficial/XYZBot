@@ -1,8 +1,11 @@
-package ch.frily.xyzbot.ticketsystem;
+package ch.frily.xyzbot.ticketsystem.panel.interaction;
 
 import ch.frily.xyzbot.interactions.button.IButton;
+import ch.frily.xyzbot.interactions.modal.IModal;
+import ch.frily.xyzbot.ticketsystem.TicketTypeGroup;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
 public class SupportButton implements IButton {
@@ -33,7 +36,8 @@ public class SupportButton implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        // Show modal to select further
-        event.reply("*Interaction received. Feature incomplete.*").setEphemeral(true).queue();
+        TypeSelectorModal modal = new TypeSelectorModal();
+        modal.setTypeGroup(TicketTypeGroup.SUPPORT);
+        event.replyModal(modal.build()).queue();
     }
 }

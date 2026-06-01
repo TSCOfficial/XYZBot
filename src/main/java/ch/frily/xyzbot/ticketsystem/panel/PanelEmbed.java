@@ -1,14 +1,12 @@
-package ch.frily.xyzbot.ticketsystem;
+package ch.frily.xyzbot.ticketsystem.panel;
 
-import ch.frily.xyzbot.Client;
+import ch.frily.xyzbot.ticketsystem.TicketTypeGroup;
 import ch.frily.xyzbot.utils.EnvKey;
 import ch.frily.xyzbot.utils.EnvResolver;
 import ch.frily.xyzbot.utils.Field;
 import ch.frily.xyzbot.utils.IEmbed;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

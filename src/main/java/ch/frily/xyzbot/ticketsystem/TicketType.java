@@ -12,7 +12,7 @@ import java.util.List;
 public enum TicketType {
     SUPPORT_GENERAL(
             "sup",
-            "Support",
+            "Generelles Anliegen",
             "Wenn du ein Anliegen hast, ob Problem oder sonstiges.",
             TicketTypeGroup.SUPPORT,
             List.of(EnvKey.ROLE_SUPPORT)
