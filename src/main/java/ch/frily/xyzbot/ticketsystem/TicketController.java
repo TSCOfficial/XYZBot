@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class TicketController {
         return instance;
     }
 
-    public void createTicket(TicketType type, Member ticketOwner) {
+    public void createTicket(TicketType type, Member ticketOwner, Consumer<TextChannel> onCreated) {
 
         // check if permitted: Bewerbung-support -> Has linked account with minecraft?
         isPermitted(type, ticketOwner);
@@ -51,6 +52,7 @@ public class TicketController {
                     ticket.setChannel(textChannel);
                     textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getMentions().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
                             .addEmbeds(createEmbed(ticket)).queue();
+                    onCreated.accept(textChannel);
         });
     }
 

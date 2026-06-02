@@ -82,7 +82,7 @@ public enum TicketType {
     ),
     BEWERBUNG_ENTWICKLUNG(
             "dev",
-            "💻 Bewerbung – Bereich Entwicklung",
+            "💻 Entwicklung",
             "Bewirb dich für den Bereich Entwicklung und unterstütze unser technisches Team.",
             """
                     Vielen Dank für dein Interesse!
@@ -105,7 +105,7 @@ public enum TicketType {
 
     BEWERBUNG_BAUTRUPP(
             "bau",
-            "🏗️ Bewerbung – Bautrupp",
+            "🏗️ Bautrupp",
             "Bewirb dich für den Bereich Bautrupp und gestalte unsere Spielwelt mit.",
             """
                     Vielen Dank für dein Interesse!
@@ -127,7 +127,7 @@ public enum TicketType {
     ),
     BEWERBUNG_GESTALTUNG(
             "design",
-            "🎨 Bewerbung – Gestaltung",
+            "🎨 Gestaltung",
             "Bewirb dich für den Bereich Gestaltung und präge das visuelle Erscheinungsbild des Servers.",
             """
                    Vielen Dank für dein Interesse!
@@ -150,7 +150,7 @@ public enum TicketType {
     ),
     BEWERBUNG_SUPPORT(
             "supvote",
-            "🛡️ Bewerbung – Support",
+            "🛡️ Support",
             "Bewirb dich für den Bereich Support. (Teil vom Support-Vote: Freischaltung benötigt!)",
             """
                    Vielen Dank für dein Interesse!
@@ -172,7 +172,7 @@ public enum TicketType {
     ),
     BEWERBUNG_SOCIALMEDIA(
             "social",
-            "🎬 Bewerbung – Social Media",
+            "🎬 Social Media",
             "Bewirb dich für das Social Media Team und präsentiere den Server deiner Community.",
             """
                     Vielen Dank für dein Interesse!
@@ -195,7 +195,7 @@ public enum TicketType {
     ),
     BEWERBUNG_EVENTTEAM(
             "event",
-            "🎉 Bewerbung – Eventteam",
+            "🎉 Eventteam",
             "Bewirb dich im Eventteam und organisiere unvergessliche Community-Events.",
             """
                     Vielen Dank für dein Interesse!
@@ -223,6 +223,7 @@ public enum TicketType {
                     *Dieses Ticket erreicht direkt die Serverleitung.*
  
                     Bitte beschreibe dein Anliegen so detailliert wie möglich:
+                    
                     - Was ist das Problem / dein Wunsch?
                     - Was wurde bisher unternommen?
                     - Gibt es Beweise oder relevante Informationen? (Bitte lade sie hier hoch)

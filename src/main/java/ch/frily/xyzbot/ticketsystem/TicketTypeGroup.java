@@ -12,7 +12,7 @@ public enum TicketTypeGroup {
             "Wenn du ein Anliegen hast, ob Problem oder sonstiges."
     ),
     BEWERBUNG(
-            "Bewerbung Bereich Entwicklung",
+            "Bewerbung",
             "Bewerbung als Dev"),
     LEITUNG(
             "Leitung",
