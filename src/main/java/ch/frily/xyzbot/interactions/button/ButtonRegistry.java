@@ -1,8 +1,6 @@
 package ch.frily.xyzbot.interactions.button;
 
-import ch.frily.xyzbot.ticketsystem.panel.interaction.BewerbungButton;
-import ch.frily.xyzbot.ticketsystem.panel.interaction.LeitungButton;
-import ch.frily.xyzbot.ticketsystem.panel.interaction.SupportButton;
+import ch.frily.xyzbot.ticketsystem.panel.interaction.*;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -30,7 +28,9 @@ public class ButtonRegistry {
         List<IButton> rawButtons = List.of(
                 new SupportButton(),
                 new BewerbungButton(),
-                new LeitungButton()
+                new LeitungButton(),
+                CloseRequestAcceptBtn.getInstance(),
+                CloseRequestRejectBtn.getInstance()
         );
         rawButtons.forEach(btn -> {
             String idOrUrl = btn.getId();

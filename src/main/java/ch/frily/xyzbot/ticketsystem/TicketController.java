@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -62,9 +63,11 @@ public class TicketController {
         embed.setTitle(ticket.getType().getLabel());
         String description = "Willkommen **" + ticket.getOwner().getUser().getGlobalName() + "**!" +
                 "\n" +
-                ticket.getType().getEmbedDescription();
+                ticket.getType().getEmbedDescription() +
+                "\n" +
+                "-# Mit /ticket add können weitere benutzer Hinzugefügt werden.";
         embed.setDescription(description);
-        embed.setFooter(ticket.getChannel().getName());
+        embed.setFooter(TicketController.getInstance().getTicketNameWithoutStatus(ticket.getChannel()));
         embed.setTimestamp(new Date().toInstant());
         embed.setColor(ticket.getOwner().getColors().getPrimary());
         return embed.build();
@@ -76,6 +79,23 @@ public class TicketController {
         String username = ticketOwner.getUser().getEffectiveName();
         int randInt = ThreadLocalRandom.current().nextInt(100000, 999999);
         return status + typeId + "-" + username  + "-" + randInt;
+    }
+
+    public String getTicketNameWithoutStatus(TextChannel channel){
+        List<String> statusIcons = Arrays.stream(TicketStatus.values())
+                .map(TicketStatus::getIcon)
+                .toList();
+
+        String channelName = channel.getName();
+
+        for (String icon : statusIcons) {
+            if (channelName.startsWith(icon)) {
+                channelName = channelName.substring(icon.length());
+                break;
+            }
+        }
+
+        return channelName;
     }
 
     /**

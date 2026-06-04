@@ -1,12 +1,10 @@
 package ch.frily.xyzbot.listeners;
 
-import ch.frily.xyzbot.ticketsystem.TicketClaimAction;
+import ch.frily.xyzbot.ticketsystem.actions.TicketClaimAction;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Member;
 
 @Slf4j
 public class MessageSendListener extends ListenerAdapter {

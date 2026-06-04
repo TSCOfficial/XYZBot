@@ -35,10 +35,7 @@ public interface IButton {
             idOrUrl = getUrl();
         }
         Button button = Button.of(getStyle(), idOrUrl, getLabel(), getEmoji());
-        if (isDisabled()) {
-            button.asDisabled();
-        }
-        return button;
+        return button.withDisabled(isDisabled());
     }
 
     void execute(@NotNull ButtonInteractionEvent event);
