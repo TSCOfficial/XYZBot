@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.ticketsystem.actions;
+package ch.frily.xyzbot.ticketsystem.embeds;
 
 import ch.frily.xyzbot.ticketsystem.TicketController;
 import ch.frily.xyzbot.utils.IEmbed;
@@ -7,15 +7,18 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
-import java.time.Instant;
 
-public class CloseRejectedEmbed implements IEmbed {
+/**
+ * Embed used after the Ticket was closed. Displays Ticket Informations
+ */
+public class ClosedOptionsEmbed implements IEmbed {
 
     @Setter
     private Member member;
 
     @Setter
     private TextChannel channel;
+
 
     @Override
     public String getAuthorName() {
@@ -29,21 +32,16 @@ public class CloseRejectedEmbed implements IEmbed {
 
     @Override
     public String getTitle() {
-        return "Schliessanfrage abgelehnt";
+        return "Ticket archivieren?";
     }
 
     @Override
     public String getDescription() {
-        return member.getAsMention() + " hat eine Schliessanfrage abgelehnt.";
-    }
-
-    @Override
-    public Color getColor() {
-        return member.getColors().getPrimary();
+        return "Soll das Ticket nun archiviert oder entdültig gelöscht werden?\n-# Ein Transkript wird automatisch generiert und hinterlegt.";
     }
 
     @Override
     public String getFooterText() {
-        return TicketController.getInstance().getTicketNameWithoutStatus(channel);
+        return TicketController.getTicketNameWithoutStatus(channel);
     }
 }

@@ -1,14 +1,12 @@
-package ch.frily.xyzbot.ticketsystem.actions;
+package ch.frily.xyzbot.ticketsystem.embeds;
 
 import ch.frily.xyzbot.ticketsystem.TicketController;
 import ch.frily.xyzbot.utils.IEmbed;
-import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
-import java.time.Instant;
 
 public class CloseRequestEmbed implements IEmbed {
 
@@ -30,7 +28,7 @@ public class CloseRequestEmbed implements IEmbed {
 
     @Override
     public String getTitle() {
-        return "Schliessanfrage";
+        return "🔓 Schliessanfrage";
     }
 
     @Override
@@ -45,6 +43,6 @@ public class CloseRequestEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return TicketController.getInstance().getTicketNameWithoutStatus(channel);
+        return TicketController.getTicketNameWithoutStatus(channel);
     }
 }

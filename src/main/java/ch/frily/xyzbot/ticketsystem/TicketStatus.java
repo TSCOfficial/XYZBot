@@ -5,7 +5,8 @@ import lombok.Getter;
 public enum TicketStatus {
     NEW("🔶"),
     CLAIMED("🎫"),
-    ARCHIVED("🗃️");
+    ARCHIVED("🗃️"),
+    CLOSED("🔻");
 
     @Getter
     private final String icon;

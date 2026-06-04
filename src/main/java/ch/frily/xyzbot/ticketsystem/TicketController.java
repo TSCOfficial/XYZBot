@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -73,7 +74,7 @@ public class TicketController {
         return embed.build();
     }
 
-    private String generateTicketName(TicketType type, Member ticketOwner) {
+    private static String generateTicketName(TicketType type, Member ticketOwner) {
         String status = TicketStatus.NEW.getIcon();
         String typeId = type.getId();
         String username = ticketOwner.getUser().getEffectiveName();
@@ -81,7 +82,7 @@ public class TicketController {
         return status + typeId + "-" + username  + "-" + randInt;
     }
 
-    public String getTicketNameWithoutStatus(TextChannel channel){
+    public static String getTicketNameWithoutStatus(TextChannel channel){
         List<String> statusIcons = Arrays.stream(TicketStatus.values())
                 .map(TicketStatus::getIcon)
                 .toList();
@@ -96,6 +97,49 @@ public class TicketController {
         }
 
         return channelName;
+    }
+
+    public void changeTicketStatus(TicketStatus newStatus, TextChannel channel){
+        channel.getManager().setName(newStatus.getIcon() + getTicketNameWithoutStatus(channel)).queue();
+    }
+
+    /**
+     * Checks if the {@link TextChannel} is a Ticket or nor
+     * @param channel
+     * @return True if its a Ticketchannel / False if not
+     */
+    public static boolean isTicketchannel(TextChannel channel) {
+        List<String> ticketTypeIds = Arrays.stream(TicketType.values())
+                .map(TicketType::getId)
+                .toList();
+
+        String nameWithoutStatus = getTicketNameWithoutStatus(channel);
+        return ticketTypeIds.stream().anyMatch(nameWithoutStatus::startsWith);
+    }
+
+    /**
+     * Checks if the {@link TextChannel} is a NEW Ticket or nor
+     * @param channel
+     * @return True if its a NEW Ticket / False if not
+     */
+    public static boolean isNewTicketchannel(TextChannel channel) {
+        List<String> ticketTypeIds = Arrays.stream(TicketType.values())
+                .map(TicketType::getId)
+                .toList();
+
+        return ticketTypeIds.stream().anyMatch(typeId -> {
+            return channel.getName().startsWith(TicketStatus.NEW.getIcon() + typeId);
+        });
+    }
+
+    /**
+     * Checks if the user is a Teammember or nor
+     * @param user
+     * @return True if its a Teammember / False if not
+     */
+    public static boolean userIsTeammember(User user) {
+        Role teamRole = EnvResolver.getRoleById(EnvKey.ROLE_TEAM);
+        return EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT).getMemberById(user.getId()).getRoles().contains(teamRole);
     }
 
     /**

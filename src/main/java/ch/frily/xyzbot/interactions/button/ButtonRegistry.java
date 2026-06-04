@@ -29,8 +29,8 @@ public class ButtonRegistry {
                 new SupportButton(),
                 new BewerbungButton(),
                 new LeitungButton(),
-                CloseRequestAcceptBtn.getInstance(),
-                CloseRequestRejectBtn.getInstance()
+                new CloseRequestAcceptBtn(),
+                new CloseRequestRejectBtn()
         );
         rawButtons.forEach(btn -> {
             String idOrUrl = btn.getId();

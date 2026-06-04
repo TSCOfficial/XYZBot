@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.Objects;
 
+import static ch.frily.xyzbot.ticketsystem.TicketController.isNewTicketchannel;
+import static ch.frily.xyzbot.ticketsystem.TicketController.userIsTeammember;
+
 @Slf4j
 public class TicketClaimAction extends TicketAction {
 

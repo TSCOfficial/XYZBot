@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.ticketsystem.actions;
+package ch.frily.xyzbot.ticketsystem.embeds;
 
 import ch.frily.xyzbot.ticketsystem.TicketController;
 import ch.frily.xyzbot.utils.IEmbed;
@@ -7,9 +7,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
-import java.time.Instant;
 
-public class CloseAcceptedEmbed implements IEmbed {
+public class CloseRejectedEmbed implements IEmbed {
 
     @Setter
     private Member member;
@@ -29,12 +28,12 @@ public class CloseAcceptedEmbed implements IEmbed {
 
     @Override
     public String getTitle() {
-        return "Schliessanfrage angenommen";
+        return "❌ Schliessanfrage abgelehnt";
     }
 
     @Override
     public String getDescription() {
-        return member.getAsMention() + " hat die Schliessanfrage angenommen. Das Ticket wird nun geschlossen.";
+        return member.getAsMention() + " hat eine Schliessanfrage abgelehnt.";
     }
 
     @Override
@@ -44,6 +43,6 @@ public class CloseAcceptedEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return TicketController.getInstance().getTicketNameWithoutStatus(channel);
+        return TicketController.getTicketNameWithoutStatus(channel);
     }
 }
