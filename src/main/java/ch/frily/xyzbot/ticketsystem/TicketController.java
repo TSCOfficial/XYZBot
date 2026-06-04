@@ -43,7 +43,7 @@ public class TicketController {
         ticket.setOwner(ticketOwner);
 
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
-        ActionRow actionrow = ActionRow.of(new TicketClaimButton().build());
+        ActionRow actionrow = ActionRow.of(List.of());
         // Ticket settings
         ticketCategory.createTextChannel(generateTicketName(type, ticketOwner))
                 .addMemberPermissionOverride(ticketOwner.getIdLong(), ownerPermissions, null)
