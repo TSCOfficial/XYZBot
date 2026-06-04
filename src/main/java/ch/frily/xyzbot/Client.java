@@ -3,6 +3,7 @@ package ch.frily.xyzbot;
 import ch.frily.xyzbot.interactions.button.ButtonRegistry;
 import ch.frily.xyzbot.interactions.modal.ModalRegistry;
 import ch.frily.xyzbot.listeners.InteractionListener;
+import ch.frily.xyzbot.listeners.MessageSendListener;
 import ch.frily.xyzbot.listeners.OnReadyListener;
 import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
 import ch.frily.xyzbot.interactions.slashcommand.SlashCommandRegistry;
@@ -78,6 +79,7 @@ public class Client {
         jdaBuilder.addEventListeners(InteractionListener.getInstance());
         jdaBuilder.addEventListeners(OnReadyListener.getInstance());
         jdaBuilder.addEventListeners(GuildMemberUpdateListener.getInstance());
+        jdaBuilder.addEventListeners(MessageSendListener.getInstance());
         return jdaBuilder.build();
     }
 

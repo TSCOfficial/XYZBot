@@ -26,14 +26,14 @@ public enum TicketType {
     ),
     SUPPORT_ENTBANNANTRAG(
             "unban",
-            "🔓 Entbannantrag / Entmute-Antrag",
-            "Du wurdest gebannt oder gemutet und möchtest Einspruch erheben.",
+            "🔓 Entbannungs- / Entmutungsantrag",
+            "Du wurdest gebannt oder gemutet und möchtest deine Unschuld zeigen.",
             """
                     Bitte beantworte folgende Fragen wahrheitsgemäss und vollständig:
      
-                    1. **Dein Minecraft-Name** / Discord-Name
-                    2. **Art der Strafe** – Ban, Mute, IP-Ban, Discord-Ban?
-                    3. **Wann wurdest du bestraft?** – Ungefähres Datum / Uhrzeit
+                    1. **Dein Minecraft-Name**
+                    2. **Art der Strafe** – Ban / Mute?
+                    3. **Wann wurdest du bestraft?** – Ungefähres Datum und Uhrzeit
                     4. **Genannter Grund** – Was wurde dir als Grund mitgeteilt?
                     5. **Deine Erklärung** – Warum sollte die Strafe aufgehoben oder reduziert werden?
                     6. **Beweise** – Falls vorhanden, lade sie hier hoch.
@@ -105,7 +105,7 @@ public enum TicketType {
 
     BEWERBUNG_BAUTRUPP(
             "bau",
-            "🏗️ Bautrupp",
+            "⚒️ Bautrupp",
             "Bewirb dich für den Bereich Bautrupp und gestalte unsere Spielwelt mit.",
             """
                     Vielen Dank für dein Interesse!
@@ -150,7 +150,7 @@ public enum TicketType {
     ),
     BEWERBUNG_SUPPORT(
             "supvote",
-            "🛡️ Support",
+            "🔰 Support",
             "Bewirb dich für den Bereich Support. (Teil vom Support-Vote: Freischaltung benötigt!)",
             """
                    Vielen Dank für dein Interesse!
@@ -262,14 +262,14 @@ public enum TicketType {
     @Getter
     private final TicketTypeGroup group;
     @Getter
-    private final List<Role> mentions;
+    private final List<Role> responsibleRoles;
 
-    TicketType(String id, String label, String selectDescription, String embedDescription, TicketTypeGroup group, List<EnvKey> mentions){
+    TicketType(String id, String label, String selectDescription, String embedDescription, TicketTypeGroup group, List<EnvKey> responsibleRoles){
         this.id = id;
         this.label = label;
         this.selectDescription = selectDescription;
         this.embedDescription = embedDescription;
         this.group = group;
-        this.mentions = mentions.stream().map(EnvResolver::getRoleById).toList();
+        this.responsibleRoles = responsibleRoles.stream().map(EnvResolver::getRoleById).toList();
     }
 }

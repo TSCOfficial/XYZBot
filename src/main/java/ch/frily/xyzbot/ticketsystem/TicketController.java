@@ -5,6 +5,7 @@ import ch.frily.xyzbot.utils.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -42,7 +43,7 @@ public class TicketController {
         ticket.setOwner(ticketOwner);
 
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
-
+        ActionRow actionrow = ActionRow.of(new TicketClaimButton().build());
         // Ticket settings
         ticketCategory.createTextChannel(generateTicketName(type, ticketOwner))
                 .addMemberPermissionOverride(ticketOwner.getIdLong(), ownerPermissions, null)
@@ -50,8 +51,8 @@ public class TicketController {
                 .queue(textChannel -> {
                     // Ticket content
                     ticket.setChannel(textChannel);
-                    textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getMentions().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
-                            .addEmbeds(createEmbed(ticket)).queue();
+                    textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getResponsibleRoles().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
+                            .addEmbeds(createEmbed(ticket)).setComponents(actionrow).queue();
                     onCreated.accept(textChannel);
         });
     }
@@ -70,10 +71,11 @@ public class TicketController {
     }
 
     private String generateTicketName(TicketType type, Member ticketOwner) {
+        String status = TicketStatus.NEW.getIcon();
         String typeId = type.getId();
-        String username = ticketOwner.getUser().getGlobalName();
+        String username = ticketOwner.getUser().getEffectiveName();
         int randInt = ThreadLocalRandom.current().nextInt(100000, 999999);
-        return typeId + "-" + username  + "-" + randInt;
+        return status + typeId + "-" + username  + "-" + randInt;
     }
 
     /**

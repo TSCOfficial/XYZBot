@@ -9,19 +9,24 @@ import lombok.Getter;
 public enum TicketTypeGroup {
     SUPPORT(
             "Support",
-            "Wenn du ein Anliegen hast, ob Problem oder sonstiges."
+            """
+                    Hier findest du Hilfe bei allgemeinen Anliegen, technischen Problemen oder Regelverstössen.
+                    """
     ),
     BEWERBUNG(
             "Bewerbung",
-            "Bewerbung als Dev"),
+            """
+                    Möchtest du Teil unseres Teams werden? Hier kannst du dich für verschiedene Bereiche bewerben.
+                    """
+    ),
     LEITUNG(
             "Leitung",
             """
-                    Bitte nutze dieses Ticket nur, wenn:
-                    - Dein Anliegen über die Möglichkeiten des Supports hinausgeht.
-                    - Es sich um ein vertrauliches oder sensibles Thema handelt.
-                    - Du bereits ein Support-Ticket hattest, das nicht gelöst wurde.
-                    """);
+                    Direkter Kontakt zur Serverleitung für vertrauliche oder komplexe Anliegen.
+                    
+                    -# Bitte nutze diesen Bereich nur, wenn dein Anliegen nicht durch den Support gelöst werden kann.
+                    """
+    );
 
     @Getter
     private final String label;
@@ -33,7 +38,7 @@ public enum TicketTypeGroup {
      * @param label Label of the group (displayed on the panel)
      * @param description Description of the group (displayed on the panel)
      */
-    TicketTypeGroup(String label, String description){
+    TicketTypeGroup(String label, String description) {
         this.label = label;
         this.description = description;
     }
