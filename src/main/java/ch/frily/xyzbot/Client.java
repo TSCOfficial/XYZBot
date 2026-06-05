@@ -1,12 +1,12 @@
 package ch.frily.xyzbot;
 
-import ch.frily.xyzbot.interactions.button.ButtonRegistry;
-import ch.frily.xyzbot.interactions.modal.ModalRegistry;
-import ch.frily.xyzbot.listeners.InteractionListener;
-import ch.frily.xyzbot.listeners.MessageSendListener;
-import ch.frily.xyzbot.listeners.OnReadyListener;
-import ch.frily.xyzbot.listeners.GuildMemberUpdateListener;
-import ch.frily.xyzbot.interactions.slashcommand.SlashCommandRegistry;
+import ch.frily.xyzbot.interaction.button.ButtonRegistry;
+import ch.frily.xyzbot.interaction.modal.ModalRegistry;
+import ch.frily.xyzbot.listener.InteractionListener;
+import ch.frily.xyzbot.listener.OnMessageReceived;
+import ch.frily.xyzbot.listener.OnReadyListener;
+import ch.frily.xyzbot.listener.OnGuildMemberUpdate;
+import ch.frily.xyzbot.interaction.command.SlashCommandRegistry;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -78,8 +78,8 @@ public class Client {
         // Event listeners
         jdaBuilder.addEventListeners(InteractionListener.getInstance());
         jdaBuilder.addEventListeners(OnReadyListener.getInstance());
-        jdaBuilder.addEventListeners(GuildMemberUpdateListener.getInstance());
-        jdaBuilder.addEventListeners(MessageSendListener.getInstance());
+        jdaBuilder.addEventListeners(OnGuildMemberUpdate.getInstance());
+        jdaBuilder.addEventListeners(OnMessageReceived.getInstance());
         return jdaBuilder.build();
     }
 
