@@ -7,20 +7,11 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class SupportButton implements IButton {
-
-    private static SupportButton instance;
-
-    public static SupportButton getInstance(){
-        if (instance == null) {
-            instance = new SupportButton();
-        }
-        return instance;
-    }
+public class TicketSupportBtn implements IButton {
 
     @Override
     public String getId() {
-        return "ticket-support";
+        return "ticket-support-btn";
     }
 
     @Override

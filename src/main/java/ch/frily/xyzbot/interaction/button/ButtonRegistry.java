@@ -26,11 +26,13 @@ public class ButtonRegistry {
 
     public void loadButtons() {
         List<IButton> rawButtons = List.of(
-                new SupportButton(),
+                new TicketSupportBtn(),
                 new TicketBewerbungButton(),
-                new LeitungButton(),
+                new TicketLeitungBtn(),
                 new TicketCloseRequestAcceptBtn(),
-                new CloseRequestRejectBtn()
+                new TicketCloseRequestRejectBtn(),
+                new TicketArchiveBtn(),
+                new TicketCloseRequestBtn()
         );
         rawButtons.forEach(btn -> {
             String idOrUrl = btn.getId();

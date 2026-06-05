@@ -1,33 +1,35 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.interaction.button.IButton;
-import ch.frily.xyzbot.util.TicketTypeGroup;
-import ch.frily.xyzbot.interaction.modal.modal.TicketTypeSelectorModal;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class TicketBewerbungButton implements IButton {
-
+public class TicketArchiveBtn implements IButton {
     @Override
     public String getId() {
-        return "ticket-bewerbung-btn";
+        return "ticket-archive-btn";
     }
 
     @Override
     public String getLabel() {
-        return "Bewerbung";
+        return "Archivieren";
     }
 
     @Override
     public ButtonStyle getStyle() {
-        return ButtonStyle.SUCCESS;
+        return ButtonStyle.SECONDARY;
+    }
+
+    @Override
+    public EmojiUnion getEmoji() {
+        return Emoji.fromFormatted("🗃️");
     }
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        TicketTypeSelectorModal modal = new TicketTypeSelectorModal();
-        modal.setTypeGroup(TicketTypeGroup.BEWERBUNG);
-        event.replyModal(modal.build()).queue();
+
     }
 }

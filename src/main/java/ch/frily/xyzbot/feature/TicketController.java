@@ -1,16 +1,14 @@
 package ch.frily.xyzbot.feature;
 
-import ch.frily.xyzbot.feature.entity.Ticket;
+import ch.frily.xyzbot.embed.TicketOpenEmbed;
 import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -18,11 +16,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static ch.frily.xyzbot.feature.Ticket.getTicketNameWithoutStatus;
 
 @Slf4j
 public class TicketController {
@@ -49,6 +48,8 @@ public class TicketController {
 
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
         ActionRow actionrow = ActionRow.of(List.of());
+        TicketOpenEmbed embed = new TicketOpenEmbed();
+        embed.setTicket(ticket);
         // Ticket settings
         ticketCategory.createTextChannel(generateTicketName(type, ticketOwner))
                 .addMemberPermissionOverride(ticketOwner.getIdLong(), ownerPermissions, null)
@@ -57,82 +58,30 @@ public class TicketController {
                     // Ticket content
                     ticket.setChannel(textChannel);
                     textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getResponsibleRoles().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
-                            .addEmbeds(createEmbed(ticket)).setComponents(actionrow).queue();
+                            .addEmbeds(embed.build()).setComponents(actionrow).queue();
                     onCreated.accept(textChannel);
         });
     }
 
-    private MessageEmbed createEmbed(Ticket ticket) {
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle(ticket.getType().getLabel());
-        String description = "Willkommen **" + ticket.getOwner().getUser().getGlobalName() + "**!" +
-                "\n" +
-                ticket.getType().getEmbedDescription() +
-                "\n" +
-                "-# Mit /ticket add können weitere benutzer Hinzugefügt werden.";
-        embed.setDescription(description);
-        embed.setFooter(TicketController.getInstance().getTicketNameWithoutStatus(ticket.getChannel()));
-        embed.setTimestamp(new Date().toInstant());
-        embed.setColor(ticket.getOwner().getColors().getPrimary());
-        return embed.build();
-    }
-
-    private static String generateTicketName(TicketType type, Member ticketOwner) {
+    public String generateTicketName(TicketType type, Member owner) {
         String status = TicketStatus.NEW.getIcon();
         String typeId = type.getId();
-        String username = ticketOwner.getUser().getEffectiveName();
+        String username = owner.getUser().getEffectiveName();
         int randInt = ThreadLocalRandom.current().nextInt(100000, 999999);
         return status + typeId + "-" + username  + "-" + randInt;
     }
 
-    public static String getTicketNameWithoutStatus(TextChannel channel){
-        List<String> statusIcons = Arrays.stream(TicketStatus.values())
-                .map(TicketStatus::getIcon)
-                .toList();
-
-        String channelName = channel.getName();
-
-        for (String icon : statusIcons) {
-            if (channelName.startsWith(icon)) {
-                channelName = channelName.substring(icon.length());
-                break;
-            }
-        }
-
-        return channelName;
-    }
-
-    public void changeTicketStatus(TicketStatus newStatus, TextChannel channel){
-        channel.getManager().setName(newStatus.getIcon() + getTicketNameWithoutStatus(channel)).queue();
-    }
-
     /**
      * Checks if the {@link TextChannel} is a Ticket or nor
-     * @param channel
      * @return True if its a Ticketchannel / False if not
      */
-    public static boolean isTicketchannel(TextChannel channel) {
+    public boolean isTicketchannel(TextChannel channel) {
         List<String> ticketTypeIds = Arrays.stream(TicketType.values())
                 .map(TicketType::getId)
                 .toList();
 
         String nameWithoutStatus = getTicketNameWithoutStatus(channel);
         return ticketTypeIds.stream().anyMatch(nameWithoutStatus::startsWith);
-    }
-
-    /**
-     * Checks if the {@link TextChannel} is a NEW Ticket or nor
-     * @param channel
-     * @return True if its a NEW Ticket / False if not
-     */
-    public static boolean isNewTicketchannel(TextChannel channel) {
-        List<String> ticketTypeIds = Arrays.stream(TicketType.values())
-                .map(TicketType::getId)
-                .toList();
-
-        return ticketTypeIds.stream().anyMatch(typeId -> {
-            return channel.getName().startsWith(TicketStatus.NEW.getIcon() + typeId);
-        });
     }
 
     /**

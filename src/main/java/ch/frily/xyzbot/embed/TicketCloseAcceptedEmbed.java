@@ -1,5 +1,6 @@
 package ch.frily.xyzbot.embed;
 
+import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketController;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
@@ -42,6 +43,6 @@ public class TicketCloseAcceptedEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return TicketController.getTicketNameWithoutStatus(channel);
+        return Ticket.getTicketNameWithoutStatus(channel);
     }
 }

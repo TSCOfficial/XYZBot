@@ -1,5 +1,6 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
+import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.util.TicketStatus;
@@ -18,7 +19,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
     @Override
     public String getId() {
-        return "ticket-closerequest-accept-button";
+        return "ticket-close-request-accept-btn";
     }
 
     @Override
@@ -41,7 +42,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
         // Edit requestMessage
         TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
-        CloseRequestRejectBtn rejectBtn = new CloseRequestRejectBtn();
+        TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
         acceptBtn.setDisabled(true);
         rejectBtn.setDisabled(true);
 
@@ -62,7 +63,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
         event.getChannel().asTextChannel().getMemberPermissionOverrides().forEach(memberOverride -> {
             memberOverride.delete().queue();
         });
-        TicketController.getInstance().changeTicketStatus(TicketStatus.CLOSED, event.getChannel().asTextChannel());
+        Ticket.changeTicketStatus(TicketStatus.CLOSED, event.getChannel().asTextChannel());
 
         // Send new rejectEmbed
         TicketClosedOptionsEmbed optionEmbed = new TicketClosedOptionsEmbed();

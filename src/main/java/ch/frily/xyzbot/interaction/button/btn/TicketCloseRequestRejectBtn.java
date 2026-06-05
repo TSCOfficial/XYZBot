@@ -10,14 +10,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
-public class CloseRequestRejectBtn implements IButton {
+public class TicketCloseRequestRejectBtn implements IButton {
 
     @Setter
     private boolean disabled = false;
 
     @Override
     public String getId() {
-        return "ticket-closerequest-reject-button";
+        return "ticket-close-request-reject-btn";
     }
 
     @Override
@@ -32,7 +32,6 @@ public class CloseRequestRejectBtn implements IButton {
 
     @Override
     public boolean isDisabled() {
-        log.debug("Disabled status: {}", disabled);
         return disabled;
     }
 
@@ -40,7 +39,7 @@ public class CloseRequestRejectBtn implements IButton {
     public void execute(@NotNull ButtonInteractionEvent event) {
 
         TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
-        CloseRequestRejectBtn rejectBtn = new CloseRequestRejectBtn();
+        TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
         acceptBtn.setDisabled(true);
         rejectBtn.setDisabled(true);
 

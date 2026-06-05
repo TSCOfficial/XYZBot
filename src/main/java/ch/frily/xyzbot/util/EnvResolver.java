@@ -106,6 +106,10 @@ public class EnvResolver {
         return Client.getInstance().getClient().getCategoryById(categoryId);
     }
 
+    public static String getString(EnvKey keyword){
+        return Client.getInstance().getConfig().get(keyword.name());
+    }
+
     /**
      * Checks the keyword for empty or null value, and resolves the key
      * @param keyword
@@ -116,10 +120,10 @@ public class EnvResolver {
         if (Objects.equals(keyword, "")) {
             throw new IllegalArgumentException("Illegal keyword");
         }
-        log.error(keyword.name());
+        log.error("Keyword: " + keyword.name());
         String value = Client.getInstance().getConfig().get(keyword.name());
 
-        log.debug(value);
+        log.debug("Resolved: " + value);
 
         if (Objects.equals(value, "") || value == null) throw new IllegalStateException("Keyword is null");
         if (type == String.class) return type.cast(value);

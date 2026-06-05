@@ -7,20 +7,11 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class LeitungButton implements IButton {
-
-    private static LeitungButton instance;
-
-    public static LeitungButton getInstance(){
-        if (instance == null) {
-            instance = new LeitungButton();
-        }
-        return instance;
-    }
+public class TicketLeitungBtn implements IButton {
 
     @Override
     public String getId() {
-        return "ticket-leitung";
+        return "ticket-leitung-btn";
     }
 
     @Override

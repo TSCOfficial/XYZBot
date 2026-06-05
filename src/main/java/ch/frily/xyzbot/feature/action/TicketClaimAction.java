@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.Objects;
 
-import static ch.frily.xyzbot.feature.TicketController.isNewTicketchannel;
+import static ch.frily.xyzbot.feature.Ticket.isNewTicket;
 import static ch.frily.xyzbot.feature.TicketController.userIsTeammember;
 
 @Slf4j
@@ -20,7 +20,7 @@ public class TicketClaimAction {
      * @return True if everything was executed properly / False if the channel is not a Ticketchannel.
      */
     public void execute(TextChannel channel, User user) {
-        if (!isNewTicketchannel(channel) || !userIsTeammember(user)){
+        if (!isNewTicket(channel) || !userIsTeammember(user)){
             return;
         };
 

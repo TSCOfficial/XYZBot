@@ -2,6 +2,9 @@ package ch.frily.xyzbot.util;
 
 public enum EnvKey {
     CRED_TOKEN,
+    CRED_DB_URL,
+    CRED_DB_USERNAME,
+    CRED_DB_PASSWORD,
     GUILD_XYZCRAFT,
     ROLE_LEITUNG,
     ROLE_ENTWICKLUNG,
