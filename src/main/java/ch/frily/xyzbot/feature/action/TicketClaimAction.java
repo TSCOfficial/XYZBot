@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import java.util.Objects;
 
 import static ch.frily.xyzbot.feature.Ticket.isNewTicket;
-import static ch.frily.xyzbot.feature.TicketController.userIsTeammember;
+import static ch.frily.xyzbot.feature.TicketManager.userIsTeammember;
 
 @Slf4j
 public class TicketClaimAction {

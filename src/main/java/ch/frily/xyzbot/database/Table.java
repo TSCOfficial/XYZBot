@@ -6,8 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Table {
-    TICKET("ticket", TicketColumn.class),
-    USER("user", UserColumn.class);
+    TICKET("ticket", TicketColumn.class);
 
     private final String table;
     private final Class<? extends Column> columnClass;
@@ -24,20 +23,11 @@ public enum Table {
     @RequiredArgsConstructor
     public enum TicketColumn implements Column {
         ID("id"),
-        TITLE("title"),
-        STATUS("status"),
-        CREATED_AT("created_at");
-
-        private final String column;
-    }
-
-    // USER
-    @Getter
-    @RequiredArgsConstructor
-    public enum UserColumn implements Column {
-        ID("id"),
-        USERNAME("username"),
-        EMAIL("email");
+        OWNER_ID("owner_id"),
+        ASSIGNEE_ID("assignee_id"),
+        CHANNEL_ID("channel_id"),
+        TYPE("type"),
+        LAST_ACTIVITY_AT("last_activity_at");
 
         private final String column;
     }

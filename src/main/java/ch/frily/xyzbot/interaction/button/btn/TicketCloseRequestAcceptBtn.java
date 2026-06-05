@@ -2,7 +2,6 @@ package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.interaction.button.IButton;
-import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.embed.TicketCloseAcceptedEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;

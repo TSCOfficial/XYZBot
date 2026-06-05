@@ -2,15 +2,20 @@ package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.database.DatabaseQuery;
 import ch.frily.xyzbot.database.Table;
+import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
+import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestAcceptBtn;
+import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestRejectBtn;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,43 +45,12 @@ public class Ticket {
     @Setter
     private TicketType type;
 
-    // When the ticket was opened
-    @Getter
-    private LocalDateTime createdAt;
-
     // When the last message was sent
     @Getter
     private LocalDateTime lastActivityAt;
 
     public long getId(){
         return channel.getIdLong();
-    }
-
-    /**
-     * Fetch a Ticket from the database.
-     * @param id Ticket id (represented by the Ticket-Channel-ID)
-     * @return The instance of this Ticket
-     * @throws SQLException
-     */
-    public static Ticket getFromDatabase(long id) throws SQLException {
-        Ticket ticket = new Ticket();
-        ResultSet resultSet = new DatabaseQuery(Table.TICKET)
-                .select()
-                .where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, id).executeQuery();
-
-        resultSet.next();
-
-        long ownerId = resultSet.getLong("owner_id");
-        long assigneeId = resultSet.getLong("assignee_id");
-        long channelId = resultSet.getLong("channel_id");
-        String type = resultSet.getString("type");
-        Guild guild = EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT);
-
-        ticket.setOwner(guild.getMemberById(ownerId));
-        ticket.setAssignee(guild.getMemberById(assigneeId));
-        ticket.setChannel(guild.getTextChannelById(channelId));
-        ticket.setType(TicketType.valueOf(type));
-        return ticket;
     }
 
 
@@ -115,7 +89,14 @@ public class Ticket {
         });
     }
 
-    public void close(Member initiator){
-        changeTicketStatus(TicketStatus.CLOSED, channel);
+    public void requestClose(IReplyCallback event){
+        ActionRow actionrow = ActionRow.of(
+                new TicketCloseRequestAcceptBtn().build(),
+                new TicketCloseRequestRejectBtn().build()
+        );
+        TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
+        requestEmbed.setMember(event.getMember());
+        requestEmbed.setChannel(channel);
+        event.getHook().editOriginalEmbeds(requestEmbed.build()).setComponents(actionrow).queue();
     }
 }

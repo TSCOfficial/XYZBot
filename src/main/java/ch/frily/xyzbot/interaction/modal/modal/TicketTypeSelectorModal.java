@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.interaction.modal.modal;
 
 import ch.frily.xyzbot.interaction.modal.IModal;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketManager;
 import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.TicketTypeGroup;
 import lombok.Setter;
@@ -57,7 +57,7 @@ public class TicketTypeSelectorModal implements IModal {
                     Objects.equals(type.getId(), event.getValue("select-menu:ticket-type-selector").getAsStringList().getFirst())
             ).findFirst().orElseThrow(() -> new IllegalStateException("Tickettyp ist ungültig."));
 
-            TicketController.getInstance().createTicket(ticketType, event.getMember(), channel -> {
+            TicketManager.getInstance().createTicket(ticketType, event.getMember(), channel -> {
                 event.getHook().sendMessage("Dein Ticket wurde erstellt: " + channel.getAsMention()).queue();
             });
         } catch (PermissionException permissionException) {

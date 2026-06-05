@@ -1,7 +1,6 @@
 package ch.frily.xyzbot.embed;
 
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;

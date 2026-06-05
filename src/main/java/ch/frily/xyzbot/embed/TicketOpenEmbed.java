@@ -1,6 +1,5 @@
 package ch.frily.xyzbot.embed;
 
-import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.feature.Ticket;
 import lombok.Setter;
 

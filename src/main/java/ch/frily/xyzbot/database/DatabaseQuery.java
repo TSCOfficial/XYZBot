@@ -127,7 +127,7 @@ public class DatabaseQuery {
      * @param table The database table to execute the query on
      */
     public DatabaseQuery(Table table) {
-        this.table = table.getTablename();
+        this.table = table.getTable();
     }
 
     /**
