@@ -42,4 +42,8 @@ public class TicketController {
         ticket.setType(TicketType.valueOf(type));
         return ticket;
     }
+
+    public static Ticket updateCloseRequestCount(int newValue){
+
+    }
 }
