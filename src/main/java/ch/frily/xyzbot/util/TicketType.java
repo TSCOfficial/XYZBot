@@ -3,7 +3,9 @@ package ch.frily.xyzbot.util;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Role;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public enum TicketType {
     SUPPORT_GENERAL(
@@ -269,5 +271,19 @@ public enum TicketType {
         this.embedDescription = embedDescription;
         this.group = group;
         this.responsibleRoles = responsibleRoles.stream().map(EnvResolver::getRoleById).toList();
+    }
+
+    /**
+     * Checks the enum for duplicate entries : Used due to its multiple use-cases in connection with the database etc.
+     */
+    static {
+        Set<String> seen = new HashSet<>();
+        for (TicketType type : values()) {
+            if (!seen.add(type.getId())) {
+                throw new ExceptionInInitializerError(
+                        "Duplicate TicketType ID: \"" + type.getId() + "\""
+                );
+            }
+        }
     }
 }

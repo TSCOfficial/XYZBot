@@ -135,8 +135,8 @@ public class DatabaseQuery {
      * @param fields All fields to be selected. If left empty, it selects all ( * )
      * @return The database query
      */
-    public DatabaseQuery select(String... fields) {
-        selectFields.addAll(Arrays.asList(fields));
+    public DatabaseQuery select(Table.Column... fields) {
+        selectFields.addAll(Arrays.stream(fields).map(Table.Column::getColumn).toList());
         type = QueryType.SELECT;
         return this;
     }
@@ -149,13 +149,13 @@ public class DatabaseQuery {
      * @return The database query
      */
     public DatabaseQuery where(Table.Column column, Operator operator, Object value) {
-        whereClauses.add(column + " " + operator.getSymbol() + " ?");
+        whereClauses.add(column.getColumn() + " " + operator.getSymbol() + " ?");
         params.add(value);
         return this;
     }
 	
-	public DatabaseQuery orderBy(String column, OrderBy order) {
-		selectOrder.put(column, order);
+	public DatabaseQuery orderBy(Table.Column column, OrderBy order) {
+		selectOrder.put(column.getColumn(), order);
 		return this;
 	}
 
@@ -165,9 +165,9 @@ public class DatabaseQuery {
      * @param value The value to insert into the field
      * @return The database query
      */
-    public DatabaseQuery insert(String fieldName, Object value) {
+    public DatabaseQuery insert(Table.Column fieldName, Object value) {
         type = QueryType.INSERT;
-        updateFields.put(fieldName, value);
+        updateFields.put(fieldName.getColumn(), value);
         return this;
     }
 
@@ -177,9 +177,9 @@ public class DatabaseQuery {
      * @param value The value to update the field to
      * @return The database query
      */
-    public DatabaseQuery update(String fieldName, Object value) {
+    public DatabaseQuery update(Table.Column fieldName, Object value) {
         type = QueryType.UPDATE;
-        updateFields.put(fieldName, value);
+        updateFields.put(fieldName.getColumn(), value);
         return this;
     }
 
@@ -195,12 +195,12 @@ public class DatabaseQuery {
     /**
      * Add a <b>normal</b> join from a foreign table to the original table
      * @param table The table to join to
-     * @param originalRef The original table column reference
+     * @param originalRef The reference from the original table (defined in the constructor)
      * @param operator The operator used to join the correct records
-     * @param foreignRef The foreign table column reference
+     * @param foreignRef The reference from the foreign table that gets added on top of the original table
      * @return The database query
      */
-    public DatabaseQuery join(String table, String originalRef, Operator operator, String foreignRef) {
+    public DatabaseQuery join(Table table, Table.Column originalRef, Operator operator, Table.Column foreignRef) {
         return join(JoinType.NORMAL, table, originalRef, operator, foreignRef);
     }
 
@@ -208,13 +208,13 @@ public class DatabaseQuery {
      * Add a <b>specific</b> join from a foreign table to the original table
      * @param joinType Select the specific join type
      * @param table The table to join to
-     * @param originalRef The original table column reference
+     * @param originalRef The reference from the original table (defined in the constructor)
      * @param operator The operator used to join the correct records
-     * @param foreignRef The foreign table column reference
+     * @param foreignRef The reference from the foreign table that gets added on top of the original table
      * @return The database query
      */
-    public DatabaseQuery join(JoinType joinType, String table, String originalRef, Operator operator, String foreignRef) {
-        joins.add(joinType.getName() + " JOIN " + table + " ON " + originalRef + " " + operator.getSymbol() + " " + foreignRef);
+    public DatabaseQuery join(JoinType joinType, Table table, Table.Column originalRef, Operator operator, Table.Column foreignRef) {
+        joins.add(joinType.getName() + " JOIN " + table.getTable() + " ON " + originalRef.getColumn() + " " + operator.getSymbol() + " " + foreignRef.getColumn());
         return this;
     }
 

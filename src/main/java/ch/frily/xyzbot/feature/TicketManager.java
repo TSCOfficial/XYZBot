@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.embed.TicketOpenEmbed;
+import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestBtn;
 import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.EnvKey;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -50,7 +52,9 @@ public class TicketManager {
         ticket.setOwner(ticketOwner);
 
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
-        ActionRow actionrow = ActionRow.of(List.of());
+        ActionRow actionrow = ActionRow.of(List.of(
+                new TicketCloseRequestBtn().build()
+        ));
         TicketOpenEmbed embed = new TicketOpenEmbed();
         embed.setTicket(ticket);
         // Ticket settings
@@ -63,7 +67,13 @@ public class TicketManager {
                     textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getResponsibleRoles().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
                             .addEmbeds(embed.build()).setComponents(actionrow).queue();
                     onCreated.accept(textChannel);
-        });
+                    try {
+                        TicketController.createTicket(ticket);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        textChannel.sendMessage("Dieses Ticket wurde aufgrund eines Technischen fehlers nicht mit der Datenbank synchronisiert. Ticketfunktionen können eingeschrenkt sein.").queue();
+                        }
+                });
     }
 
     public String generateTicketName(TicketType type, Member owner) {

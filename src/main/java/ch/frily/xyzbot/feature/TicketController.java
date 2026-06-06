@@ -1,5 +1,6 @@
 package ch.frily.xyzbot.feature;
 
+import ch.frily.xyzbot.database.Database;
 import ch.frily.xyzbot.database.DatabaseQuery;
 import ch.frily.xyzbot.database.Table;
 import ch.frily.xyzbot.util.EnvKey;
@@ -17,7 +18,8 @@ public class TicketController {
      * Fetch a Ticket from the database.
      * @param id Ticket id (represented by the Ticket-Channel-ID)
      * @return The instance of this Ticket
-     * @throws SQLException
+     * @throws SQLException When the database is unreachable
+     * @throws NotFoundException When no ticket with given ID exist
      */
     public static Ticket getTicketById(long id) throws SQLException, NotFoundException {
         Ticket ticket = new Ticket();
@@ -43,7 +45,13 @@ public class TicketController {
         return ticket;
     }
 
-    public static Ticket updateCloseRequestCount(int newValue){
-
+    public static void createTicket(Ticket ticket) throws SQLException {
+        DatabaseQuery query = new DatabaseQuery(Table.TICKET);
+        Database.getInstance().connect();
+        query.insert(Table.TicketColumn.ID, ticket.getId());
+        query.insert(Table.TicketColumn.OWNER_ID, ticket.getOwner().getIdLong());
+        query.insert(Table.TicketColumn.CHANNEL_ID, ticket.getChannel().getIdLong());
+        query.insert(Table.TicketColumn.TYPE_ID, ticket.getType().getId());
+        query.executeQuery();
     }
 }

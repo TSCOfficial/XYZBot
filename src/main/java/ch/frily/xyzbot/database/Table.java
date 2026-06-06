@@ -26,7 +26,7 @@ public enum Table {
         OWNER_ID("owner_id"),
         ASSIGNEE_ID("assignee_id"),
         CHANNEL_ID("channel_id"),
-        TYPE("type"),
+        TYPE_ID("type_id"),
         LAST_ACTIVITY_AT("last_activity_at");
 
         private final String column;
