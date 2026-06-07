@@ -3,7 +3,6 @@ package ch.frily.xyzbot.embed;
 import ch.frily.xyzbot.feature.Ticket;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
 
@@ -13,7 +12,7 @@ public class TicketCloseRejectedEmbed implements IEmbed {
     private Member member;
 
     @Setter
-    private TextChannel channel;
+    private Ticket ticket;
 
     @Override
     public String getAuthorName() {
@@ -42,6 +41,6 @@ public class TicketCloseRejectedEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return Ticket.getTicketNameWithoutStatus(channel);
+        return ticket.getNameWithoutStatus();
     }
 }

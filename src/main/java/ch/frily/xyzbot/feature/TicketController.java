@@ -1,6 +1,5 @@
 package ch.frily.xyzbot.feature;
 
-import ch.frily.xyzbot.database.Database;
 import ch.frily.xyzbot.database.DatabaseQuery;
 import ch.frily.xyzbot.database.Table;
 import ch.frily.xyzbot.util.EnvKey;
@@ -8,6 +7,7 @@ import ch.frily.xyzbot.util.EnvResolver;
 import ch.frily.xyzbot.util.TicketType;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,36 +22,45 @@ public class TicketController {
      * @throws NotFoundException When no ticket with given ID exist
      */
     public static Ticket getTicketById(long id) throws SQLException, NotFoundException {
-        Ticket ticket = new Ticket();
         ResultSet resultSet = new DatabaseQuery(Table.TICKET)
                 .select()
-                .where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, id).executeQuery();
+                .where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, id).executeArchitectureQuery();
 
-        if (resultSet.getFetchSize() == 0) {
-            throw new NotFoundException("Ticket mir ID " + id + " wurde nicht gefunden.");
-        }
         resultSet.next();
 
-        long ownerId = resultSet.getLong("owner_id");
-        long assigneeId = resultSet.getLong("assignee_id");
-        long channelId = resultSet.getLong("channel_id");
-        String type = resultSet.getString("type");
+        long ownerId = resultSet.getLong(Table.TicketColumn.OWNER_ID.getColumn());
+        long assigneeId = resultSet.getLong(Table.TicketColumn.ASSIGNEE_ID.getColumn());
+        long channelId = resultSet.getLong(Table.TicketColumn.CHANNEL_ID.getColumn());
+        String typeString = resultSet.getString(Table.TicketColumn.TYPE.getColumn());
         Guild guild = EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT);
 
-        ticket.setOwner(guild.getMemberById(ownerId));
+        Member owner = guild.getMemberById(ownerId);
+        TicketType type = TicketType.valueOf(typeString);
+        Ticket ticket = new Ticket(owner, type);
         ticket.setAssignee(guild.getMemberById(assigneeId));
         ticket.setChannel(guild.getTextChannelById(channelId));
-        ticket.setType(TicketType.valueOf(type));
         return ticket;
     }
 
     public static void createTicket(Ticket ticket) throws SQLException {
         DatabaseQuery query = new DatabaseQuery(Table.TICKET);
-        Database.getInstance().connect();
         query.insert(Table.TicketColumn.ID, ticket.getId());
         query.insert(Table.TicketColumn.OWNER_ID, ticket.getOwner().getIdLong());
         query.insert(Table.TicketColumn.CHANNEL_ID, ticket.getChannel().getIdLong());
-        query.insert(Table.TicketColumn.TYPE_ID, ticket.getType().getId());
-        query.executeQuery();
+        query.insert(Table.TicketColumn.TYPE, ticket.getType().name());
+        query.insert(Table.TicketColumn.WELCOME_MESSAGE_ID, ticket.getWelcomeMessage().getIdLong());
+        query.executeDataQuery();
+    }
+
+    public static void updateTicket(Ticket ticket) throws SQLException {
+        DatabaseQuery query = new DatabaseQuery(Table.TICKET);
+
+        if (ticket.getAssignee() != null) {
+            query.update(Table.TicketColumn.ASSIGNEE_ID, ticket.getAssignee().getId());
+        }
+        query.update(Table.TicketColumn.LAST_ACTIVITY_AT, ticket.getLastActivityAt());
+        query.update(Table.TicketColumn.IS_REQUEST_PENDING, ticket.isRequestPending());
+        query.update(Table.TicketColumn.CLOSE_REQUEST_COUNT, ticket.getCloseRequestCount());
+        query.executeDataQuery();
     }
 }

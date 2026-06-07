@@ -11,11 +11,6 @@ public class TicketOpenEmbed implements IEmbed {
     private Ticket ticket;
 
     @Override
-    public String getAuthorName() {
-        return ticket.getOwner().getEffectiveName();
-    }
-
-    @Override
     public String getAuthorIconUrl() {
         return ticket.getOwner().getEffectiveAvatarUrl();
     }
@@ -41,6 +36,6 @@ public class TicketOpenEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return Ticket.getTicketNameWithoutStatus(ticket.getChannel());
+        return ticket.getNameWithoutStatus();
     }
 }

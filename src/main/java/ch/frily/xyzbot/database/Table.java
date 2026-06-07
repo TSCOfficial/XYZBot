@@ -26,8 +26,11 @@ public enum Table {
         OWNER_ID("owner_id"),
         ASSIGNEE_ID("assignee_id"),
         CHANNEL_ID("channel_id"),
-        TYPE_ID("type_id"),
-        LAST_ACTIVITY_AT("last_activity_at");
+        TYPE("type"),
+        LAST_ACTIVITY_AT("last_activity_at"),
+        WELCOME_MESSAGE_ID("welcome_message_id"),
+        IS_REQUEST_PENDING("is_request_pending"),
+        CLOSE_REQUEST_COUNT("close_request_count");
 
         private final String column;
     }

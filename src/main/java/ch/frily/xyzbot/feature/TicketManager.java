@@ -6,10 +6,12 @@ import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -22,8 +24,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static ch.frily.xyzbot.feature.Ticket.getTicketNameWithoutStatus;
 
 @Slf4j
 /**
@@ -47,9 +47,7 @@ public class TicketManager {
         // check if permitted: Bewerbung-support -> Has linked account with minecraft?
         isPermitted(type, ticketOwner);
 
-        Ticket ticket = new Ticket();
-        ticket.setType(type);
-        ticket.setOwner(ticketOwner);
+        Ticket ticket = new Ticket(ticketOwner, type);
 
         Category ticketCategory = EnvResolver.getCategoryById(EnvKey.CATEGORY_TICKETS);
         ActionRow actionrow = ActionRow.of(List.of(
@@ -65,14 +63,17 @@ public class TicketManager {
                     // Ticket content
                     ticket.setChannel(textChannel);
                     textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getResponsibleRoles().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
-                            .addEmbeds(embed.build()).setComponents(actionrow).queue();
+                            .addEmbeds(embed.build()).setComponents(actionrow).queue( message -> {
+                                ticket.setWelcomeMessage(message);
+                                try {
+                                    TicketController.createTicket(ticket);
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                    textChannel.sendMessage("Dieses Ticket wurde aufgrund eines Technischen fehlers nicht mit der Datenbank synchronisiert. Ticketfunktionen können eingeschrenkt sein.").queue();
+                                }
+                            });
+
                     onCreated.accept(textChannel);
-                    try {
-                        TicketController.createTicket(ticket);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        textChannel.sendMessage("Dieses Ticket wurde aufgrund eines Technischen fehlers nicht mit der Datenbank synchronisiert. Ticketfunktionen können eingeschrenkt sein.").queue();
-                        }
                 });
     }
 
@@ -88,13 +89,18 @@ public class TicketManager {
      * Checks if the {@link TextChannel} is a Ticket or nor
      * @return True if its a Ticketchannel / False if not
      */
-    public boolean isTicketchannel(TextChannel channel) {
-        List<String> ticketTypeIds = Arrays.stream(TicketType.values())
-                .map(TicketType::getId)
-                .toList();
-
-        String nameWithoutStatus = getTicketNameWithoutStatus(channel);
-        return ticketTypeIds.stream().anyMatch(nameWithoutStatus::startsWith);
+    public boolean isTicketchannel(TextChannel channel) throws SQLException {
+        try {
+            Ticket ticket = TicketController.getTicketById(channel.getIdLong());
+            if (ticket != null){
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 
     /**

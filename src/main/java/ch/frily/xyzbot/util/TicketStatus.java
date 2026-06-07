@@ -3,7 +3,7 @@ package ch.frily.xyzbot.util;
 import lombok.Getter;
 
 public enum TicketStatus {
-    NEW("🔶"),
+    NEW("👋"),
     CLAIMED("🎫"),
     ARCHIVED("🗃️"),
     CLOSED("🔻");

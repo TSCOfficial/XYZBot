@@ -3,7 +3,6 @@ package ch.frily.xyzbot.embed;
 import ch.frily.xyzbot.feature.Ticket;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 /**
  * Embed used after the Ticket was closed. Displays Ticket Informations
@@ -14,7 +13,7 @@ public class TicketClosedOptionsEmbed implements IEmbed {
     private Member member;
 
     @Setter
-    private TextChannel channel;
+    private Ticket ticket;
 
 
     @Override
@@ -39,6 +38,6 @@ public class TicketClosedOptionsEmbed implements IEmbed {
 
     @Override
     public String getFooterText() {
-        return Ticket.getTicketNameWithoutStatus(channel);
+        return ticket.getNameWithoutStatus();
     }
 }

@@ -52,7 +52,7 @@ public class TicketCloseCmd implements ISlashSubcommand {
 
                 TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
                 optionsEmbed.setMember(ticket.getAssignee());
-                optionsEmbed.setChannel(ticket.getChannel());
+                optionsEmbed.setTicket(ticket);
                 event.getHook().sendMessageEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
 
             } else {
@@ -63,7 +63,7 @@ public class TicketCloseCmd implements ISlashSubcommand {
 
                 TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
                 requestEmbed.setMember(ticket.getAssignee());
-                requestEmbed.setChannel(ticket.getChannel());
+                requestEmbed.setTicket(ticket);
                 event.getHook().sendMessageEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
             }
 

@@ -220,23 +220,27 @@ public class DatabaseQuery {
 
 
     /**
-     * Execute the database query
+     * Execute the database query for architectural purposes
      * @return The database results
      * @throws SQLException Happens when the Database refuses the connection or is not reachable
      */
-    public ResultSet executeQuery() throws SQLException {
+    public ResultSet executeArchitectureQuery() throws SQLException {
         Connection conn = Database.getInstance().connect();
         PreparedStatement stmt = conn.prepareStatement(buildSQL());
         setParameters(stmt);
         return stmt.executeQuery();
     }
 
-//    public int executeUpdate() throws SQLException {
-//        Connection conn = Database.connect();
-//        PreparedStatement stmt = conn.prepareStatement(buildSQL());
-//        setParameters(stmt);
-//        return stmt.executeUpdate();
-//    }
+    /**
+     * For every data manipulation query that does not return any {@link ResultSet}.
+     * @throws SQLException
+     */
+    public void executeDataQuery() throws SQLException {
+        Connection conn = Database.getInstance().connect();
+        PreparedStatement stmt = conn.prepareStatement(buildSQL());
+        setParameters(stmt);
+        stmt.executeUpdate();
+    }
 
     /**
      * Builds the SQl query depending on the query type

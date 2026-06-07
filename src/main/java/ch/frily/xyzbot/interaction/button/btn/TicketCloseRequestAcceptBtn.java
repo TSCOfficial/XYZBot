@@ -3,7 +3,6 @@ package ch.frily.xyzbot.interaction.button.btn;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.interaction.button.IButton;
-import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.embed.TicketCloseAcceptedEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
 import javassist.NotFoundException;
@@ -45,8 +44,9 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        event.deferReply(true).queue();
+        event.deferReply().queue();
         try {
+            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
             // Edit requestMessage
             TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
             TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
@@ -55,7 +55,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
             TicketCloseAcceptedEmbed acceptedEmbed = new TicketCloseAcceptedEmbed();
             acceptedEmbed.setMember(event.getMember());
-            acceptedEmbed.setChannel(event.getChannel().asTextChannel());
+            acceptedEmbed.setTicket(ticket);
 
             event.getMessage().editMessageEmbeds(acceptedEmbed.build())
                     .setComponents(
@@ -67,7 +67,6 @@ public class TicketCloseRequestAcceptBtn implements IButton {
                     .queue();
 
             // Send options
-            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
             ticket.close();
             ActionRow actionRow = ActionRow.of(List.of(
                     new TicketDeleteBtn().build(),
@@ -76,7 +75,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
             TicketClosedOptionsEmbed optionEmbed = new TicketClosedOptionsEmbed();
             optionEmbed.setMember(event.getMember());
-            optionEmbed.setChannel(event.getChannel().asTextChannel());
+            optionEmbed.setTicket(ticket);
             event.getHook().sendMessageEmbeds(optionEmbed.build()).addComponents(actionRow).queue();
         } catch (SQLException | NotFoundException sqlException) {
             log.error(sqlException.getMessage());

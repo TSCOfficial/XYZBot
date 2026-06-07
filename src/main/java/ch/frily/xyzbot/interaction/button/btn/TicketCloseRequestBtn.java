@@ -1,7 +1,6 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
-import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.interaction.button.IButton;
@@ -38,9 +37,10 @@ public class TicketCloseRequestBtn implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        event.deferReply(true).queue();
+        event.deferReply().queue();
         try {
             Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
+            ticket.requestClose();
 
             ActionRow actionRow = ActionRow.of(
                     new TicketCloseRequestAcceptBtn().build(),
@@ -48,10 +48,14 @@ public class TicketCloseRequestBtn implements IButton {
             );
 
             TicketCloseRequestEmbed optionsEmbed = new TicketCloseRequestEmbed();
-            optionsEmbed.setMember(ticket.getAssignee());
-            optionsEmbed.setChannel(ticket.getChannel());
-            event.getHook().sendMessageEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+            optionsEmbed.setMember(event.getMember());
+            optionsEmbed.setTicket(ticket);
 
+            String assigneeMention = "";
+            if (ticket.getAssignee() != null) {
+                assigneeMention = ticket.getAssignee().getAsMention();
+            }
+            event.getHook().sendMessage(assigneeMention).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
         } catch (SQLException | NotFoundException exception) {
             event.getHook().editOriginal(exception.getMessage()).queue();
         }
