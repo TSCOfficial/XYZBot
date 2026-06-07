@@ -1,19 +1,21 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.embed.TicketCloseRejectedEmbed;
+import ch.frily.xyzbot.util.EnvResolver;
 import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class TicketCloseRequestRejectBtn implements IButton {
@@ -43,9 +45,9 @@ public class TicketCloseRequestRejectBtn implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
-        event.getComponent().withDisabled(true);
+
         try {
-            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
+            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
 
 //            TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
 //            TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
@@ -60,9 +62,14 @@ public class TicketCloseRequestRejectBtn implements IButton {
 
             event.editMessageEmbeds(embed.build())
                     .setComponents(
-                            MessageUtil.toggleAllMessageComponentDisableableState(event.getMessage(), true)
+                            MessageUtil.disableAllMessageComponents(event.getMessage())
                     )
                     .queue();
+
+            CompletableFuture<Message> welcomeMessage = EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId());
+            welcomeMessage.thenAccept(message -> {
+              message.editMessageComponents(MessageUtil.enableAllMessageComponents(message)).queue();
+            });
         } catch (SQLException | NotFoundException sqlException){
             event.getHook().editOriginal(sqlException.getMessage()).queue();
         }

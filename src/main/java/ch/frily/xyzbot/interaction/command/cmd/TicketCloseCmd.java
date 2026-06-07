@@ -3,7 +3,7 @@ package ch.frily.xyzbot.interaction.command.cmd;
 import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.btn.TicketArchiveBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestAcceptBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestRejectBtn;
@@ -41,20 +41,23 @@ public class TicketCloseCmd implements ISlashSubcommand {
     public void execute(@NotNull SlashCommandInteractionEvent event) {
         event.deferReply(true).queue();
         try {
-            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
+            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
 
             if (event.getOption("erzwingen") != null && event.getOption("erzwingen").getAsBoolean()) {
-                ActionRow actionRow = ActionRow.of(
-                        new TicketArchiveBtn().build(),
-                        new TicketDeleteBtn().build()
-                );
-                ticket.close();
+                if (ticket.isForceClosable()) {
+                    ActionRow actionRow = ActionRow.of(
+                            new TicketArchiveBtn().build(),
+                            new TicketDeleteBtn().build()
+                    );
+                    ticket.close();
 
-                TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
-                optionsEmbed.setMember(ticket.getAssignee());
-                optionsEmbed.setTicket(ticket);
-                event.getHook().sendMessageEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
-
+                    TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
+                    optionsEmbed.setTicket(ticket);
+                    event.getHook().sendMessageEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+                    return;
+                }
+                event.getHook().sendMessage("❌ Ticket kann nicht geschlossen werden.\n-# Es müssen erst min. 2 Anfragen gestellt werden oder 7 Tage inaktivität.").queue();
+                return;
             } else {
                 ActionRow actionRow = ActionRow.of(
                         new TicketCloseRequestAcceptBtn().build(),
@@ -66,7 +69,6 @@ public class TicketCloseCmd implements ISlashSubcommand {
                 requestEmbed.setTicket(ticket);
                 event.getHook().sendMessageEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
             }
-
 
         } catch (SQLException | NotFoundException exception) {
             event.getHook().editOriginal(exception.getMessage()).queue();

@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.listener;
 
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.feature.TicketManager;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class OnMessageReceived extends ListenerAdapter {
             if (event.getAuthor().isBot()) return;
             log.debug("Message received");
             if (TicketManager.getInstance().isTicketchannel(event.getChannel().asTextChannel())){
-                Ticket ticket = TicketController.getTicketById(event.getChannel().getIdLong());
+                Ticket ticket = TicketRepository.getTicketById(event.getChannel().getIdLong());
                 ticket.claim(event.getMember());
 
                 log.debug("Ticket claimed by {}", event.getMember().getEffectiveName());

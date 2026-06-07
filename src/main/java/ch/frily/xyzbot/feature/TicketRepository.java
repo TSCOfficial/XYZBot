@@ -9,15 +9,13 @@ import ch.frily.xyzbot.util.TicketType;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
-public class TicketController {
+public class TicketRepository {
 
     /**
      * Fetch a Ticket from the database.
@@ -31,7 +29,9 @@ public class TicketController {
                 .select()
                 .where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, id).executeArchitectureQuery();
 
-        resultSet.next();
+        if (!resultSet.next()) {
+            throw new NotFoundException("Ticket mit ID " + id + " nicht gefunden.");
+        }
 
         long ownerId = resultSet.getLong(Table.TicketColumn.OWNER_ID.getColumn());
         long assigneeId = resultSet.getLong(Table.TicketColumn.ASSIGNEE_ID.getColumn());
@@ -58,20 +58,23 @@ public class TicketController {
         ticket.setCloseRequestCount(closeRequestCount);
         ticket.setStatus(status);
 
-        EnvResolver.getMessageById(guild.getIdLong(), channelId, welcomeMessageId).thenAccept(ticket::setWelcomeMessage);
-
+        ticket.setWelcomeMessageId(welcomeMessageId);
         return ticket;
     }
 
-    public static void createTicket(Ticket ticket) throws SQLException {
-        DatabaseQuery query = new DatabaseQuery(Table.TICKET);
-        query.insert(Table.TicketColumn.ID, ticket.getId());
-        query.insert(Table.TicketColumn.OWNER_ID, ticket.getOwner().getIdLong());
-        query.insert(Table.TicketColumn.CHANNEL_ID, ticket.getChannel().getIdLong());
-        query.insert(Table.TicketColumn.TYPE, ticket.getType().name());
-        query.insert(Table.TicketColumn.WELCOME_MESSAGE_ID, ticket.getWelcomeMessage().getIdLong());
-        query.insert(Table.TicketColumn.LAST_ACTIVITY_AT, ticket.getLastActivityAt());
-        query.executeDataQuery();
+    public static void createTicket(Ticket ticket) {
+        try {
+            DatabaseQuery query = new DatabaseQuery(Table.TICKET);
+            query.insert(Table.TicketColumn.ID, ticket.getId());
+            query.insert(Table.TicketColumn.OWNER_ID, ticket.getOwner().getIdLong());
+            query.insert(Table.TicketColumn.CHANNEL_ID, ticket.getChannel().getIdLong());
+            query.insert(Table.TicketColumn.TYPE, ticket.getType().name());
+            query.insert(Table.TicketColumn.WELCOME_MESSAGE_ID, ticket.getWelcomeMessageId());
+            query.insert(Table.TicketColumn.LAST_ACTIVITY_AT, ticket.getLastActivityAt());
+            query.executeDataQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void updateTicket(Ticket ticket) throws SQLException {

@@ -10,20 +10,23 @@ import net.dv8tion.jda.api.entities.Member;
 public class TicketClosedOptionsEmbed implements IEmbed {
 
     @Setter
-    private Member member;
-
-    @Setter
     private Ticket ticket;
 
 
     @Override
     public String getAuthorName() {
-        return member.getEffectiveName();
+        if (ticket.getAssignee() != null) {
+            return ticket.getAssignee().getEffectiveName();
+        }
+        return null;
     }
 
     @Override
     public String getAuthorIconUrl() {
-        return member.getEffectiveAvatarUrl();
+        if (ticket.getAssignee() != null) {
+            return ticket.getAssignee().getAvatarUrl();
+        }
+        return null;
     }
 
     @Override

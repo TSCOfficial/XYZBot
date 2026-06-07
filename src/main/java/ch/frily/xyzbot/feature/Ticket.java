@@ -1,5 +1,7 @@
 package ch.frily.xyzbot.feature;
 
+import ch.frily.xyzbot.util.EnvKey;
+import ch.frily.xyzbot.util.EnvResolver;
 import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static ch.frily.xyzbot.feature.TicketManager.userIsTeammember;
 
@@ -49,9 +52,10 @@ public class Ticket {
     @Setter
     private LocalDateTime lastActivityAt;
 
+    // Async! Use with .thenAccept(Message -> ..)
     @Getter
     @Setter
-    private Message welcomeMessage;
+    private long welcomeMessageId;
 
     @Getter
     private int closeRequestCount;
@@ -94,7 +98,7 @@ public class Ticket {
     public void setStatus(TicketStatus status) throws SQLException {
         this.status = status;
         channel.getManager().setName(status.getIcon() + this.getNameWithoutStatus()).queue();
-        TicketController.updateTicket(this);
+        TicketRepository.updateTicket(this);
     }
 
     /**
@@ -114,7 +118,7 @@ public class Ticket {
         if (this.isCloseRequestable()){
             this.closeRequestCount ++;
             this.isRequestPending = true;
-            TicketController.updateTicket(this);
+            TicketRepository.updateTicket(this);
             return;
         }
         throw new IllegalStateException("In diesem Ticket kann keine Schliessanfrage gesendet werden.\n-# Das Ticket ist wohl bereits geschlossen?");
@@ -122,12 +126,12 @@ public class Ticket {
 
     public void setPendingRequest(boolean state) throws SQLException {
         isRequestPending = state;
-        TicketController.updateTicket(this);
+        TicketRepository.updateTicket(this);
     }
 
     public void setCloseRequestCount(int count) throws SQLException {
         closeRequestCount = count;
-        TicketController.updateTicket(this);
+        TicketRepository.updateTicket(this);
     }
 
     /**
@@ -142,7 +146,7 @@ public class Ticket {
             memberOverride.delete().queue();
         });
 
-        TicketController.updateTicket(this);
+        TicketRepository.updateTicket(this);
     }
 
     /**
@@ -165,7 +169,7 @@ public class Ticket {
 
         this.updateChannelTopic();
         log.debug("Updating db");
-        TicketController.updateTicket(this);
+        TicketRepository.updateTicket(this);
     }
 
     public boolean isForceClosable(){

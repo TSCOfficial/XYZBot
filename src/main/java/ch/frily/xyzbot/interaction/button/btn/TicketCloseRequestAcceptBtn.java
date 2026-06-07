@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.embed.TicketCloseAcceptedEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
@@ -46,7 +46,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
     public void execute(@NotNull ButtonInteractionEvent event) {
         event.deferReply().queue();
         try {
-            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
+            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
             // Edit requestMessage
             TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
             TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
@@ -74,9 +74,9 @@ public class TicketCloseRequestAcceptBtn implements IButton {
             ));
 
             TicketClosedOptionsEmbed optionEmbed = new TicketClosedOptionsEmbed();
-            optionEmbed.setMember(event.getMember());
             optionEmbed.setTicket(ticket);
             event.getHook().sendMessageEmbeds(optionEmbed.build()).addComponents(actionRow).queue();
+
         } catch (SQLException | NotFoundException sqlException) {
             log.error(sqlException.getMessage());
         }

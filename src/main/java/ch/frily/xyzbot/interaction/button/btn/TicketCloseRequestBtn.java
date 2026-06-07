@@ -2,8 +2,9 @@ package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
 import ch.frily.xyzbot.feature.Ticket;
-import ch.frily.xyzbot.feature.TicketController;
+import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
+import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -39,7 +40,7 @@ public class TicketCloseRequestBtn implements IButton {
     public void execute(@NotNull ButtonInteractionEvent event) {
         event.deferReply().queue();
         try {
-            Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
+            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
             ticket.requestClose();
 
             ActionRow actionRow = ActionRow.of(
@@ -56,6 +57,8 @@ public class TicketCloseRequestBtn implements IButton {
                 assigneeMention = ticket.getAssignee().getAsMention();
             }
             event.getHook().sendMessage(assigneeMention).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+
+            event.getMessage().editMessageComponents(MessageUtil.disableAllMessageComponents(event.getMessage())).queue();
         } catch (SQLException | NotFoundException exception) {
             event.getHook().editOriginal(exception.getMessage()).queue();
         }

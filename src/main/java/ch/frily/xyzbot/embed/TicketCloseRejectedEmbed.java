@@ -21,7 +21,7 @@ public class TicketCloseRejectedEmbed implements IEmbed {
 
     @Override
     public String getAuthorIconUrl() {
-        return member.getEffectiveAvatarUrl();
+        return member.getAvatarUrl();
     }
 
     @Override

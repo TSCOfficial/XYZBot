@@ -18,34 +18,35 @@ import java.util.stream.Collectors;
 public class MessageUtil {
 
     /**
-     * Enable or disable a list of Buttons
+     * Enable/Disable a list of components
+     * @param components
      * @param newState
      * @return
      */
-    public static List<ActionComponent> toggleComponentDisableableState(List<ActionComponent> components, boolean newState){
+    private static List<ActionComponent> toggleComponentDisableableState(List<ActionComponent> components, boolean newState){
         return components.stream().map(component -> {
             return component.withDisabled(newState);
         }).toList();
     }
 
-    public static List<ActionRow> toggleAllMessageComponentDisableableState(Message message, boolean newState) {
+    /**
+     * Enable/Disable all components of a message
+     * @param message
+     * @param withDisabled
+     * @return
+     */
+    private static List<ActionRow> toggleAllMessageComponentDisableableState(Message message, boolean withDisabled) {
         return message.getComponents().stream()
                 .map(actionRow -> {
-                    List<ActionRowChildComponent> newRow = actionRow.asActionRow().getComponents().stream().map(component -> {
-                        log.debug(component.asButton().getLabel());
-                        log.debug(component.getType().name());
-                        return switch (component.getType()) {
-                            case BUTTON -> component.asButton().withDisabled(newState);
-                            case STRING_SELECT -> component.asStringSelectMenu().withDisabled(newState);
-                            case USER_SELECT, ROLE_SELECT, CHANNEL_SELECT, MENTIONABLE_SELECT ->
-                                    component.asEntitySelectMenu().withDisabled(newState);
-                            default -> component;
-                        };
-                    }).toList();
-                    Button testbtn = (Button) newRow.get(1);
-                    log.debug(testbtn.getLabel());
-                    log.debug("disabled: {}", testbtn.isDisabled());
-                    return ActionRow.of(newRow);
+                    return actionRow.asActionRow().withDisabled(withDisabled);
                 }).toList();
+    }
+
+    public static List<ActionRow> disableAllMessageComponents(Message message){
+        return toggleAllMessageComponentDisableableState(message, true);
+    }
+
+    public static List<ActionRow> enableAllMessageComponents(Message message){
+        return toggleAllMessageComponentDisableableState(message, false);
     }
 }

@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -19,7 +18,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
@@ -64,13 +62,8 @@ public class TicketManager {
                     ticket.setChannel(textChannel);
                     textChannel.sendMessage(ticketOwner.getAsMention() + " - " + type.getResponsibleRoles().stream().map(Role::getAsMention).collect(Collectors.joining(", ")))
                             .addEmbeds(embed.build()).setComponents(actionrow).queue( message -> {
-                                ticket.setWelcomeMessage(message);
-                                try {
-                                    TicketController.createTicket(ticket);
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                    textChannel.sendMessage("Dieses Ticket wurde aufgrund eines Technischen fehlers nicht mit der Datenbank synchronisiert. Ticketfunktionen können eingeschrenkt sein.").queue();
-                                }
+                                ticket.setWelcomeMessageId(message.getIdLong());
+                                TicketRepository.createTicket(ticket);
                             });
 
                     onCreated.accept(textChannel);
@@ -91,11 +84,8 @@ public class TicketManager {
      */
     public boolean isTicketchannel(TextChannel channel) throws SQLException {
         try {
-            Ticket ticket = TicketController.getTicketById(channel.getIdLong());
-            if (ticket != null){
-                return true;
-            }
-            return false;
+            TicketRepository.getTicketById(channel.getIdLong());
+            return true;
         } catch (SQLException e) {
             throw new SQLException(e);
         } catch (NotFoundException e) {
