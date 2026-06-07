@@ -3,7 +3,6 @@ package ch.frily.xyzbot.listener;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.feature.TicketManager;
-import ch.frily.xyzbot.feature.action.TicketClaimAction;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -33,7 +32,7 @@ public class OnMessageReceived extends ListenerAdapter {
                 Ticket ticket = TicketController.getTicketById(event.getChannel().getIdLong());
                 ticket.claim(event.getMember());
 
-
+                log.debug("Ticket claimed by {}", event.getMember().getEffectiveName());
             }
         } catch (SQLException | NotFoundException exception) {
             log.error(exception.getMessage());

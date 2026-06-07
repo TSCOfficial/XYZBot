@@ -30,8 +30,8 @@ public enum Table {
         LAST_ACTIVITY_AT("last_activity_at"),
         WELCOME_MESSAGE_ID("welcome_message_id"),
         IS_REQUEST_PENDING("is_request_pending"),
-        CLOSE_REQUEST_COUNT("close_request_count");
-
+        CLOSE_REQUEST_COUNT("close_request_count"),
+        STATUS("status");
         private final String column;
     }
 }

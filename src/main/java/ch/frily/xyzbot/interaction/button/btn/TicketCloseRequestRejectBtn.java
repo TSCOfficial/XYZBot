@@ -4,6 +4,7 @@ import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketController;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.embed.TicketCloseRejectedEmbed;
+import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +43,16 @@ public class TicketCloseRequestRejectBtn implements IButton {
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
+        event.getComponent().withDisabled(true);
         try {
             Ticket ticket = TicketController.getTicketById(event.getChannelIdLong());
 
-            TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
-            TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
-            acceptBtn.setDisabled(true);
-            rejectBtn.setDisabled(true);
+//            TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
+//            TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
+//            acceptBtn.setDisabled(true);
+//            rejectBtn.setDisabled(true);
+
+            ticket.setPendingRequest(false);
 
             TicketCloseRejectedEmbed embed = new TicketCloseRejectedEmbed();
             embed.setMember(event.getMember());
@@ -56,10 +60,7 @@ public class TicketCloseRequestRejectBtn implements IButton {
 
             event.editMessageEmbeds(embed.build())
                     .setComponents(
-                            ActionRow.of(
-                                    acceptBtn.build(),
-                                    rejectBtn.build()
-                            )
+                            MessageUtil.toggleAllMessageComponentDisableableState(event.getMessage(), true)
                     )
                     .queue();
         } catch (SQLException | NotFoundException sqlException){

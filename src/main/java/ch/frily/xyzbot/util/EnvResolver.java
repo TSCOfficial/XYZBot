@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Resolve Discord related IDs
@@ -86,6 +88,14 @@ public class EnvResolver {
         return getChannelById(type, guildId, channelId);
     }
 
+    /**
+     * Use {@link CompletableFuture#thenAccept(Consumer)} after the call tu be able to use the {@link Message}.<br>
+     * USe {@link CompletableFuture#exceptionally(Function)} after the call to handle the exceptions
+     * @param guildId
+     * @param channelId
+     * @param messageId
+     * @return Staged Message Data - use <code>.thenAccept(data -> ...)</code>
+     */
     public static CompletableFuture<Message> getMessageById(long guildId, long channelId, long messageId) {
         MessageChannel channel = getChannelById(TextChannel.class, guildId, channelId);
         if (channel == null) {

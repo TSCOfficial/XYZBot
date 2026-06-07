@@ -4,6 +4,7 @@ import ch.frily.xyzbot.util.TicketStatus;
 import ch.frily.xyzbot.util.TicketType;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static ch.frily.xyzbot.feature.TicketManager.userIsTeammember;
 
+@Slf4j
 public class Ticket {
 
     // minimal close-requests till ticket can be force-closed
@@ -118,11 +120,22 @@ public class Ticket {
         throw new IllegalStateException("In diesem Ticket kann keine Schliessanfrage gesendet werden.\n-# Das Ticket ist wohl bereits geschlossen?");
     }
 
+    public void setPendingRequest(boolean state) throws SQLException {
+        isRequestPending = state;
+        TicketController.updateTicket(this);
+    }
+
+    public void setCloseRequestCount(int count) throws SQLException {
+        closeRequestCount = count;
+        TicketController.updateTicket(this);
+    }
+
     /**
      * Close a Ticket<br>
      * Removes user permissions, changes status, ...
      */
     public void close() throws SQLException {
+        setPendingRequest(false);
         this.status = TicketStatus.CLOSED;
 
         channel.getMemberPermissionOverrides().forEach(memberOverride -> {
@@ -137,14 +150,22 @@ public class Ticket {
      * @param member
      * @return True if claimed successfully, false if the member is not qualified or the ticket can not be claimed
      */
-    public void claim(Member member){
+    public void claim(Member member) throws SQLException {
+        log.debug("Claiming");
         if (assignee != null || !this.isNewTicket() || !userIsTeammember(member.getUser())){
+            log.debug("claim rejected");
             return;
         };
 
-        this.status = TicketStatus.CLAIMED;
+        this.assignee = member;
+
+        log.debug("new Assignee {}", assignee.getEffectiveName());
+
+        this.setStatus(TicketStatus.CLAIMED);
 
         this.updateChannelTopic();
+        log.debug("Updating db");
+        TicketController.updateTicket(this);
     }
 
     public boolean isForceClosable(){
@@ -165,11 +186,12 @@ public class Ticket {
     }
 
     public void updateChannelTopic(){
-        String topic = type.getLabel();
+        StringBuilder topic = new StringBuilder();
+        topic.append("**").append(type.getLabel()).append("**");
 
         if (assignee != null) {
-            topic += " | " + assignee.getEffectiveName();
+           topic.append(" | Ansprechsperson: ").append(assignee.getEffectiveName());
         }
-        channel.getManager().setTopic(topic).queue();
+        channel.getManager().setTopic(topic.toString()).queue();
     }
 }
