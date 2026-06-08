@@ -7,27 +7,27 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class TicketBewerbungButton implements IButton {
+public class TicketPanelLeitungBtn implements IButton {
 
     @Override
     public String getId() {
-        return "ticket-bewerbung-btn";
+        return "ticket-panel-leitung-btn";
     }
 
     @Override
     public String getLabel() {
-        return "Bewerbung";
+        return "Leitung";
     }
 
     @Override
     public ButtonStyle getStyle() {
-        return ButtonStyle.SUCCESS;
+        return ButtonStyle.SECONDARY;
     }
 
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
         TicketTypeSelectorModal modal = new TicketTypeSelectorModal();
-        modal.setTypeGroup(TicketTypeGroup.BEWERBUNG);
+        modal.setTypeGroup(TicketTypeGroup.LEITUNG);
         event.replyModal(modal.build()).queue();
     }
 }

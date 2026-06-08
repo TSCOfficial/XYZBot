@@ -1,7 +1,6 @@
 package ch.frily.xyzbot.embed;
 
 import ch.frily.xyzbot.util.Color;
-import ch.frily.xyzbot.util.Field;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 

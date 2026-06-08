@@ -48,22 +48,14 @@ public class TicketCloseRequestRejectBtn implements IButton {
 
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-
-//            TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
-//            TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
-//            acceptBtn.setDisabled(true);
-//            rejectBtn.setDisabled(true);
-
-            ticket.setPendingRequest(false);
+            ticket.rejectCloseRequest(event.getMember());
 
             TicketCloseRejectedEmbed embed = new TicketCloseRejectedEmbed();
             embed.setMember(event.getMember());
             embed.setTicket(ticket);
 
             event.editMessageEmbeds(embed.build())
-                    .setComponents(
-                            MessageUtil.disableAllMessageComponents(event.getMessage())
-                    )
+                    .setComponents(MessageUtil.disableAllMessageComponents(event.getMessage()))
                     .queue();
 
             CompletableFuture<Message> welcomeMessage = EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId());

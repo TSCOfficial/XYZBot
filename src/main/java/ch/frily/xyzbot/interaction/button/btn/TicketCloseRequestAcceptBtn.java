@@ -5,6 +5,7 @@ import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.embed.TicketCloseAcceptedEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
+import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,27 +48,17 @@ public class TicketCloseRequestAcceptBtn implements IButton {
         event.deferReply().queue();
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-            // Edit requestMessage
-            TicketCloseRequestAcceptBtn acceptBtn = new TicketCloseRequestAcceptBtn();
-            TicketCloseRequestRejectBtn rejectBtn = new TicketCloseRequestRejectBtn();
-            acceptBtn.setDisabled(true);
-            rejectBtn.setDisabled(true);
+            ticket.acceptCloseRequest(event.getMember());
 
             TicketCloseAcceptedEmbed acceptedEmbed = new TicketCloseAcceptedEmbed();
             acceptedEmbed.setMember(event.getMember());
             acceptedEmbed.setTicket(ticket);
 
             event.getMessage().editMessageEmbeds(acceptedEmbed.build())
-                    .setComponents(
-                            ActionRow.of(
-                                    acceptBtn.build(),
-                                    rejectBtn.build()
-                            )
-                    )
+                    .setComponents(MessageUtil.disableAllMessageComponents(event.getMessage()))
                     .queue();
 
             // Send options
-            ticket.close();
             ActionRow actionRow = ActionRow.of(List.of(
                     new TicketDeleteBtn().build(),
                     new TicketArchiveBtn().build()

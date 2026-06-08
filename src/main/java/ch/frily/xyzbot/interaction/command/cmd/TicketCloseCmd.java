@@ -9,6 +9,8 @@ import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestAcceptBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestRejectBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketDeleteBtn;
 import ch.frily.xyzbot.interaction.command.ISlashSubcommand;
+import ch.frily.xyzbot.util.EnvResolver;
+import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -33,7 +35,7 @@ public class TicketCloseCmd implements ISlashSubcommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.BOOLEAN, "erzwingen", "Ticketschliessung erzwingen")
+                new OptionData(OptionType.BOOLEAN, "force", "Ticketschliessung erzwingen")
         );
     }
 
@@ -43,13 +45,13 @@ public class TicketCloseCmd implements ISlashSubcommand {
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
 
-            if (event.getOption("erzwingen") != null && event.getOption("erzwingen").getAsBoolean()) {
+            if (event.getOption("force") != null && event.getOption("force").getAsBoolean()) {
                 if (ticket.isForceClosable()) {
                     ActionRow actionRow = ActionRow.of(
                             new TicketArchiveBtn().build(),
                             new TicketDeleteBtn().build()
                     );
-                    ticket.close();
+                    ticket.close(event.getMember());
 
                     TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
                     optionsEmbed.setTicket(ticket);
@@ -64,10 +66,17 @@ public class TicketCloseCmd implements ISlashSubcommand {
                         new TicketCloseRequestRejectBtn().build()
                 );
 
+                ticket.requestClose();
+
                 TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
                 requestEmbed.setMember(ticket.getAssignee());
                 requestEmbed.setTicket(ticket);
                 event.getHook().sendMessageEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
+
+                // Disable welcome message component
+                EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId()).thenAccept(message -> {
+                    message.editMessageComponents(MessageUtil.disableAllMessageComponents(message)).queue();
+                });
             }
 
         } catch (SQLException | NotFoundException exception) {

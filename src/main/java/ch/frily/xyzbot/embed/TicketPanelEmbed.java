@@ -4,7 +4,6 @@ import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.TicketTypeGroup;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
-import ch.frily.xyzbot.util.Field;
 
 import java.time.Instant;
 import java.util.Arrays;

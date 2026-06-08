@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.util;
+package ch.frily.xyzbot.embed;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
