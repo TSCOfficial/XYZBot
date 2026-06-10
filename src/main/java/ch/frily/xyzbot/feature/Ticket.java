@@ -203,6 +203,7 @@ public class Ticket {
     }
 
     public void delete() {
+        // transkript
     }
 
      // https://github.com/omardiaadev/discord-html-transcript-jda
