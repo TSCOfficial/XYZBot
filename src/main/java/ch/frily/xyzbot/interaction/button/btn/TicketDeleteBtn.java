@@ -38,6 +38,10 @@ public class TicketDeleteBtn implements IButton {
         event.deferReply().queue();
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+            ticket.generateTranscript().thenAccept(fileUpload -> {
+                // send in transkript channel
+                return;
+            });
 
         } catch (SQLException | NotFoundException e) {
             event.getHook().sendMessage(e.getMessage()).queue(); // todo möglichkeit geben den Channel so zu löschen, Sofern in Kategorie ticket??

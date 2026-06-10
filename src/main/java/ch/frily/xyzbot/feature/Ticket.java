@@ -1,12 +1,13 @@
 package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.Client;
-import ch.frily.xyzbot.util.TicketStatus;
-import ch.frily.xyzbot.util.TicketType;
+import dev.omardiaa.transcript.jda.exception.TranscriberPermissionException;
+import dev.omardiaa.transcript.jda.model.JDATranscript;
 import dev.omardiaa.transcript.jda.service.TranscriberClient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static ch.frily.xyzbot.feature.TicketManager.userIsTeammember;
 
@@ -201,30 +203,24 @@ public class Ticket {
     }
 
     public void delete() {
-        // transkript
     }
 
-    public FileUpload generateTranskript() { // https://github.com/omardiaadev/discord-html-transcript-jda
+     // https://github.com/omardiaadev/discord-html-transcript-jda
+    public CompletableFuture<FileUpload> generateTranscript() {
         TranscriberClient transcriber = new TranscriberClient(Client.getInstance().getClient());
-        transcriber.transcribe(channel)
-                .thenAccept(transcript -> {
-                    // upload and send the transcript
-                    event.getHook().sendFiles(transcript.toFileUpload()).queue();
-                })
-                .exceptionally(throwable -> {
-                    if (throwable.getCause() instanceof TranscriberPermissionException ex) {
-                        // handle permission exception
-                        event.getHook()
-                                .sendMessageFormat(
-                                        "Failed to generate transcript due to missing '%s' permission.",
-                                        ex.getPermission().getName())
-                                .queue();
-                    } else {
-                        // handle other exceptions
-                        event.getHook().sendMessage("Failed to generate transcript due to unknown exception.").queue();
-                    }
 
-                    return null;
+        return transcriber.transcribe(channel)
+                .thenApply(JDATranscript::toFileUpload)
+                .exceptionally(throwable -> {
+                    Throwable cause = throwable.getCause();
+
+                    if (cause instanceof TranscriberPermissionException ex) {
+                        throw new PermissionException(
+                                "Failed to generate transcript due to missing '%s' permission."
+                                        .formatted(ex.getMissingPermissions().stream().map(Permission::getName)));
+                    };
+
+                    throw new RuntimeException("Failed to generate transcript due to unknown exception.");
                 });
     }
 

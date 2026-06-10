@@ -4,8 +4,6 @@ import ch.frily.xyzbot.database.DatabaseQuery;
 import ch.frily.xyzbot.database.Table;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
-import ch.frily.xyzbot.util.TicketStatus;
-import ch.frily.xyzbot.util.TicketType;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,7 +11,6 @@ import net.dv8tion.jda.api.entities.Member;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.concurrent.CompletableFuture;
 
 public class TicketRepository {
 
