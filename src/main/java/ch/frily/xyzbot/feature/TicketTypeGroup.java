@@ -1,4 +1,4 @@
-package ch.frily.xyzbot.util;
+package ch.frily.xyzbot.feature;
 
 import lombok.Getter;
 

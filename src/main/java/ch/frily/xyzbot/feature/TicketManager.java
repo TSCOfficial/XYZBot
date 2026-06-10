@@ -2,8 +2,6 @@ package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.embed.TicketOpenEmbed;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestBtn;
-import ch.frily.xyzbot.util.TicketStatus;
-import ch.frily.xyzbot.util.TicketType;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import javassist.NotFoundException;

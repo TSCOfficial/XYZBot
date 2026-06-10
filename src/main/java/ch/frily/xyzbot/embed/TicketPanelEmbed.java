@@ -1,7 +1,7 @@
 package ch.frily.xyzbot.embed;
 
-import ch.frily.xyzbot.util.TicketType;
-import ch.frily.xyzbot.util.TicketTypeGroup;
+import ch.frily.xyzbot.feature.TicketType;
+import ch.frily.xyzbot.feature.TicketTypeGroup;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 

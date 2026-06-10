@@ -1,8 +1,6 @@
 package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.Client;
-import ch.frily.xyzbot.util.TicketStatus;
-import ch.frily.xyzbot.util.TicketType;
 import dev.omardiaa.transcript.jda.service.TranscriberClient;
 import lombok.Getter;
 import lombok.Setter;

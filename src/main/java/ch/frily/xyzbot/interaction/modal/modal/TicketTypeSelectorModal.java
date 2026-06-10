@@ -2,8 +2,8 @@ package ch.frily.xyzbot.interaction.modal.modal;
 
 import ch.frily.xyzbot.interaction.modal.IModal;
 import ch.frily.xyzbot.feature.TicketManager;
-import ch.frily.xyzbot.util.TicketType;
-import ch.frily.xyzbot.util.TicketTypeGroup;
+import ch.frily.xyzbot.feature.TicketType;
+import ch.frily.xyzbot.feature.TicketTypeGroup;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.label.LabelChildComponent;

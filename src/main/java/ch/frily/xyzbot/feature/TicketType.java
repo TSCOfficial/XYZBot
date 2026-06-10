@@ -1,5 +1,7 @@
-package ch.frily.xyzbot.util;
+package ch.frily.xyzbot.feature;
 
+import ch.frily.xyzbot.util.EnvKey;
+import ch.frily.xyzbot.util.EnvResolver;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Role;
 
