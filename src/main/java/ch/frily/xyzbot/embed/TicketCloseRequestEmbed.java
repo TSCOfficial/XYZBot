@@ -9,19 +9,19 @@ import java.awt.*;
 public class TicketCloseRequestEmbed implements IEmbed {
 
     @Setter
-    private Member member;
+    private Member initiator;
 
     @Setter
     private Ticket ticket;
 
     @Override
     public String getAuthorName() {
-        return member.getEffectiveName();
+        return initiator.getEffectiveName();
     }
 
     @Override
     public String getAuthorIconUrl() {
-        return member.getAvatarUrl();
+        return initiator.getAvatarUrl();
     }
 
     @Override
@@ -31,12 +31,12 @@ public class TicketCloseRequestEmbed implements IEmbed {
 
     @Override
     public String getDescription() {
-        return member.getAsMention() + " hat eine Schliessanfrage gestellt.\nMöchtest du das Ticket schliessen?";
+        return initiator.getAsMention() + " hat eine Schliessanfrage gestellt.\nMöchtest du das Ticket schliessen?";
     }
 
     @Override
     public Color getColor() {
-        return member.getColors().getPrimary();
+        return initiator.getColors().getPrimary();
     }
 
     @Override

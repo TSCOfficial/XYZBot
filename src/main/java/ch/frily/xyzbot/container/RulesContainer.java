@@ -24,7 +24,7 @@ public class RulesContainer extends Container {
 
         this.addComponent(Section.of(
                 Button.link("https://doc.xyzcraft.de/share/ql35xjvuqg/p/regelwerk-xyz-craft-netzwerk-JvIICndOWE", "Regelwerk"),
-                TextDisplay.of("*Von 30.05.2024 — Stand am: 31.05.2026*")
+                TextDisplay.of("*Von 30.05.2024 - Stand am: 31.05.2026*")
         ));
 
         this.addComponent(Separator.createDivider(Separator.Spacing.LARGE));

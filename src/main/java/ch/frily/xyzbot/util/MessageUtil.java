@@ -11,6 +11,11 @@ import net.dv8tion.jda.api.components.label.LabelChildComponent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.internal.components.actionrow.ActionRowImpl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,5 +61,30 @@ public class MessageUtil {
             template = template.replaceFirst("\\{\\}", String.valueOf(args[i++]));
         }
         return template;
+    }
+
+    public static String formatTime(Instant instant) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
+        String formattedDate = instant.atOffset(ZoneOffset.ofTotalSeconds(0)).format(formatter);
+        return formattedDate;
+    }
+
+    public static String duration(Temporal startInclusive, Temporal endExclusive){
+        Duration duration = Duration.between(startInclusive, endExclusive);
+
+        long days = duration.toDays();
+        long hours = duration.toHoursPart();
+        long minutes = duration.toMinutesPart();
+
+        String openDuration;
+        if (days > 0) {
+            openDuration = String.format("%dd %dh %dmin", days, hours, minutes);
+        } else if (hours > 0) {
+            openDuration = String.format("%dh %dmin", hours, minutes);
+        } else {
+            openDuration = String.format("%dmin", minutes);
+        }
+
+        return openDuration;
     }
 }

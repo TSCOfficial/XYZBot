@@ -32,7 +32,7 @@ public class OnGuildMemberUpdate extends ListenerAdapter {
 
         ActionRow components = ActionRow.of(
                 Button.link("https://discord.com/channels/719211950269005857/737440736529875035", "Bewerben"),
-                Button.link(Client.getInstance().getConfig().get("DOCMOST_AUFBAUORGA"), "Aufbauorganisation"));
+                Button.link(EnvResolver.getString(EnvKey.URL_AUFBAUORGANISATION), "Aufbauorganisation"));
         TextChannel channel = (TextChannel) EnvResolver.getChannelById(TextChannel.class, EnvKey.GUILD_XYZCRAFT, EnvKey.CHANNEL_DASTEAM);
 
 

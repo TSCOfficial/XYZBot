@@ -4,7 +4,6 @@ import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
 import ch.frily.xyzbot.embed.TicketClosedOptionsEmbed;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketRepository;
-import ch.frily.xyzbot.interaction.button.btn.TicketArchiveBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestAcceptBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestRejectBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketDeleteBtn;
@@ -14,6 +13,7 @@ import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,6 @@ public class TicketCloseCmd implements ISlashSubcommand {
             if (event.getOption("force") != null && event.getOption("force").getAsBoolean()) {
                 if (ticket.isForceClosable()) {
                     ActionRow actionRow = ActionRow.of(
-                            new TicketArchiveBtn().build(),
                             new TicketDeleteBtn().build()
                     );
                     ticket.close(event.getMember());
@@ -66,10 +65,10 @@ public class TicketCloseCmd implements ISlashSubcommand {
                         new TicketCloseRequestRejectBtn().build()
                 );
 
-                ticket.requestClose();
+                ticket.requestClose(event.getUser());
 
                 TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
-                requestEmbed.setMember(event.getMember());
+                requestEmbed.setInitiator(event.getMember());
                 requestEmbed.setTicket(ticket);
                 event.replyEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
 
@@ -79,7 +78,7 @@ public class TicketCloseCmd implements ISlashSubcommand {
                 });
             }
 
-        } catch (SQLException | NotFoundException | IllegalStateException exception) {
+        } catch (SQLException | NotFoundException | IllegalStateException | PermissionException exception) {
             event.reply(exception.getMessage()).queue();
         }
     }

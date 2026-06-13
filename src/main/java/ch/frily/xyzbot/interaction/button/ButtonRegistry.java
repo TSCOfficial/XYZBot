@@ -31,7 +31,6 @@ public class ButtonRegistry {
                 new TicketPanelLeitungBtn(),
                 new TicketCloseRequestAcceptBtn(),
                 new TicketCloseRequestRejectBtn(),
-                new TicketArchiveBtn(),
                 new TicketCloseRequestBtn(),
                 new TicketDeleteBtn()
         );

@@ -34,15 +34,12 @@ public class TicketClosedOptionsEmbed implements IEmbed {
 
     @Override
     public String getTitle() {
-        if (isForcedClosed) {
-            return "Ticket geschlossen - archivieren?";
-        }
-        return "Ticket archivieren?";
+        return "🔒 Ticket geschlossen";
     }
 
     @Override
     public String getDescription() {
-        return "Soll das Ticket nun archiviert oder entdültig gelöscht werden?\n-# Ein Transkript wird automatisch generiert und hinterlegt.";
+        return "Soll das Ticket gelöscht werden?\n-# Ein Transkript wird automatisch generiert und hinterlegt.";
     }
 
     @Override

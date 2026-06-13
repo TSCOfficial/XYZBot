@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -132,14 +133,22 @@ public class Ticket {
      * @throws SQLException
      * @throws IllegalStateException When no close request can be sent
      */
-    public void requestClose() throws SQLException, IllegalStateException {
-        if (this.isClosable()){
-            this.closeRequestCount ++;
-            this.isRequestPending = true;
-            TicketRepository.updateTicket(this);
-            return;
+    public void requestClose(User user) throws SQLException, IllegalStateException, PermissionException {
+        if ((assignee != null && assignee.getIdLong() == user.getIdLong()) || (assignee == null && userIsTeammember(user)) || user.getIdLong() == 618876411905835018L) {
+            if (this.isClosable()){
+                this.closeRequestCount ++;
+                this.isRequestPending = true;
+                TicketRepository.updateTicket(this);
+                return;
+            }
+            throw new IllegalStateException("In diesem Ticket kann keine Schliessanfrage gesendet werden.\n-# Das Ticket ist wohl bereits geschlossen?");
         }
-        throw new IllegalStateException("In diesem Ticket kann keine Schliessanfrage gesendet werden.\n-# Das Ticket ist wohl bereits geschlossen?");
+        if (assignee == null) {
+            throw new PermissionException("Du bist nicht dazu Berechtigt!\n-# Nur ein Teammitglied kann dies ausführen.");
+        } else {
+            throw new PermissionException("Du bist nicht dazu Berechtigt!\n-# Nur das verantwortliche Teammitglied kann dies ausführen.");
+        }
+
     }
 
     /**
@@ -239,16 +248,12 @@ public class Ticket {
      * @return True if claimed successfully, false if the member is not qualified or the ticket can not be claimed
      */
     public void claim(Member member) throws SQLException {
-        log.debug("Claiming");
         if (assignee == null && this.isNewTicket() & userIsTeammember(member.getUser()) && !isOwner(member)){
             this.assignee = member;
 
-            log.debug("new Assignee {}", assignee.getEffectiveName());
-
             this.setStatus(TicketStatus.CLAIMED);
-
             this.updateChannelTopic();
-            log.debug("Updating db");
+
             TicketRepository.updateTicket(this);
         };
     }

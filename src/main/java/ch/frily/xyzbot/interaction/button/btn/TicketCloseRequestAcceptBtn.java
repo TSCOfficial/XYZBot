@@ -62,8 +62,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
 
             // Send options
             ActionRow actionRow = ActionRow.of(List.of(
-                    new TicketDeleteBtn().build(),
-                    new TicketArchiveBtn().build()
+                    new TicketDeleteBtn().build()
             ));
 
             TicketClosedOptionsEmbed optionEmbed = new TicketClosedOptionsEmbed();

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -41,7 +42,7 @@ public class TicketCloseRequestBtn implements IButton {
         event.deferReply().queue();
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-            ticket.requestClose();
+            ticket.requestClose(event.getUser());
 
             ActionRow actionRow = ActionRow.of(
                     new TicketCloseRequestAcceptBtn().build(),
@@ -49,17 +50,13 @@ public class TicketCloseRequestBtn implements IButton {
             );
 
             TicketCloseRequestEmbed optionsEmbed = new TicketCloseRequestEmbed();
-            optionsEmbed.setMember(event.getMember());
+            optionsEmbed.setInitiator(event.getMember());
             optionsEmbed.setTicket(ticket);
 
-            String assigneeMention = "";
-            if (ticket.getAssignee() != null) {
-                assigneeMention = ticket.getAssignee().getAsMention();
-            }
-            event.getHook().sendMessage(assigneeMention).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+            event.getHook().sendMessage(ticket.getOwner().getAsMention()).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
 
             event.getMessage().editMessageComponents(MessageUtil.disableAllMessageComponents(event.getMessage())).queue();
-        } catch (SQLException | NotFoundException | IllegalStateException exception) {
+        } catch (SQLException | NotFoundException | IllegalStateException | PermissionException exception) {
             event.getHook().editOriginal(exception.getMessage()).queue();
         }
     }

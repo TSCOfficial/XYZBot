@@ -33,7 +33,7 @@ public class TicketDeleteBtn implements IButton {
 
     @Override
     public ButtonStyle getStyle() {
-        return ButtonStyle.PRIMARY;
+        return ButtonStyle.SECONDARY;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class TicketDeleteBtn implements IButton {
             ticket.generateTranscript().thenAccept(fileUpload -> {
                 fileUpload.setName("transkript-" + ticket.getNameWithoutStatus());
                 TextChannel logChannel = EnvResolver.getChannelById(TextChannel.class, EnvKey.GUILD_XYZCRAFT, EnvKey.CHANNEL_TICKETTRANSKRIPT);
-                List<Container> containers = new TicketTranscriptContainer(ticket, fileUpload).build();
+                List<Container> containers = new TicketTranscriptContainer(event.getMember(), ticket, fileUpload).build();
                 logChannel.sendMessageComponents(containers).useComponentsV2().addFiles(fileUpload).setAllowedMentions(List.of()).queue();
 
                 try {
