@@ -12,6 +12,9 @@ public class TicketClosedOptionsEmbed implements IEmbed {
     @Setter
     private Ticket ticket;
 
+    @Setter
+    private boolean isForcedClosed;
+
 
     @Override
     public String getAuthorName() {
@@ -31,6 +34,9 @@ public class TicketClosedOptionsEmbed implements IEmbed {
 
     @Override
     public String getTitle() {
+        if (isForcedClosed) {
+            return "Ticket geschlossen - archivieren?";
+        }
         return "Ticket archivieren?";
     }
 

@@ -39,6 +39,7 @@ public class TicketRepository {
         boolean isRequestPending = resultSet.getBoolean(Table.TicketColumn.IS_REQUEST_PENDING.getColumn());
         int closeRequestCount = resultSet.getInt(Table.TicketColumn.CLOSE_REQUEST_COUNT.getColumn());
         String statusName = resultSet.getString(Table.TicketColumn.STATUS.getColumn());
+        Timestamp updatedAt = resultSet.getTimestamp(Table.TicketColumn.UPDATED_AT.getColumn());
 
         Guild guild = EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT);
 
@@ -54,6 +55,7 @@ public class TicketRepository {
         ticket.setPendingRequest(isRequestPending);
         ticket.setCloseRequestCount(closeRequestCount);
         ticket.setStatus(status);
+        ticket.setUpdatedAt(updatedAt.toLocalDateTime());
 
         ticket.setWelcomeMessageId(welcomeMessageId);
         return ticket;
@@ -68,6 +70,7 @@ public class TicketRepository {
             query.insert(Table.TicketColumn.TYPE, ticket.getType().name());
             query.insert(Table.TicketColumn.WELCOME_MESSAGE_ID, ticket.getWelcomeMessageId());
             query.insert(Table.TicketColumn.LAST_ACTIVITY_AT, ticket.getLastActivityAt());
+            query.insert(Table.TicketColumn.UPDATED_AT, ticket.getUpdatedAt());
             query.executeDataQuery();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -84,6 +87,15 @@ public class TicketRepository {
         query.update(Table.TicketColumn.IS_REQUEST_PENDING, ticket.isRequestPending());
         query.update(Table.TicketColumn.CLOSE_REQUEST_COUNT, ticket.getCloseRequestCount());
         query.update(Table.TicketColumn.STATUS, ticket.getStatus().name());
+        query.update(Table.TicketColumn.UPDATED_AT, ticket.getUpdatedAt());
+        query.where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, ticket.getId());
+        query.executeDataQuery();
+    }
+
+    public static void deleteTicket(Ticket ticket) throws SQLException {
+        DatabaseQuery query = new DatabaseQuery(Table.TICKET);
+
+        query.where(Table.TicketColumn.ID, DatabaseQuery.Operator.EQUALS, ticket.getId()).delete();
         query.executeDataQuery();
     }
 }

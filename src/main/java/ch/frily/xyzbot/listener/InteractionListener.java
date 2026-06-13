@@ -3,6 +3,7 @@ package ch.frily.xyzbot.listener;
 import ch.frily.xyzbot.interaction.button.ButtonRegistry;
 import ch.frily.xyzbot.interaction.modal.ModalRegistry;
 import ch.frily.xyzbot.interaction.command.SlashCommandRegistry;
+import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -48,12 +49,21 @@ public class InteractionListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event){
-        ButtonRegistry.getInstance().dispatchButtonInteraction(event);
+        try {
+            ButtonRegistry.getInstance().dispatchButtonInteraction(event);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            exception.printStackTrace();
+        }
     }
 
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        ModalRegistry.getInstance().dispatchModalInteraction(event);
+        try {
+            ModalRegistry.getInstance().dispatchModalInteraction(event);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+        }
     }
 
 

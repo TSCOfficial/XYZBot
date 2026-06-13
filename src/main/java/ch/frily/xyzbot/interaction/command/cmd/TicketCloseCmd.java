@@ -41,7 +41,6 @@ public class TicketCloseCmd implements ISlashSubcommand {
 
     @Override
     public void execute(@NotNull SlashCommandInteractionEvent event) {
-        event.deferReply(true).queue();
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
 
@@ -55,10 +54,11 @@ public class TicketCloseCmd implements ISlashSubcommand {
 
                     TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
                     optionsEmbed.setTicket(ticket);
-                    event.getHook().sendMessageEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+                    optionsEmbed.setForcedClosed(true);
+                    event.replyEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
                     return;
                 }
-                event.getHook().sendMessage("❌ Ticket kann nicht geschlossen werden.\n-# Es müssen erst min. 2 Anfragen gestellt werden oder 7 Tage inaktivität.").queue();
+                event.reply("❌ Ticket kann nicht geschlossen werden.\n-# Es müssen erst min. 2 Anfragen gestellt werden oder 7 Tage inaktivität.").setEphemeral(true).queue();
                 return;
             } else {
                 ActionRow actionRow = ActionRow.of(
@@ -69,9 +69,9 @@ public class TicketCloseCmd implements ISlashSubcommand {
                 ticket.requestClose();
 
                 TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
-                requestEmbed.setMember(ticket.getAssignee());
+                requestEmbed.setMember(event.getMember());
                 requestEmbed.setTicket(ticket);
-                event.getHook().sendMessageEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
+                event.replyEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
 
                 // Disable welcome message component
                 EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId()).thenAccept(message -> {
@@ -79,8 +79,8 @@ public class TicketCloseCmd implements ISlashSubcommand {
                 });
             }
 
-        } catch (SQLException | NotFoundException exception) {
-            event.getHook().editOriginal(exception.getMessage()).queue();
+        } catch (SQLException | NotFoundException | IllegalStateException exception) {
+            event.reply(exception.getMessage()).queue();
         }
     }
 }

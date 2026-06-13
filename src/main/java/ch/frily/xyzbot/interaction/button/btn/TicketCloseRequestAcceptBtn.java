@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -48,6 +49,7 @@ public class TicketCloseRequestAcceptBtn implements IButton {
         event.deferReply().queue();
         try {
             Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+            log.debug("sending close request to ticket");
             ticket.acceptCloseRequest(event.getMember());
 
             TicketCloseAcceptedEmbed acceptedEmbed = new TicketCloseAcceptedEmbed();
@@ -68,8 +70,8 @@ public class TicketCloseRequestAcceptBtn implements IButton {
             optionEmbed.setTicket(ticket);
             event.getHook().sendMessageEmbeds(optionEmbed.build()).addComponents(actionRow).queue();
 
-        } catch (SQLException | NotFoundException sqlException) {
-            log.error(sqlException.getMessage());
+        } catch (SQLException | NotFoundException | PermissionException exception) {
+            log.error(exception.getMessage());
         }
     }
 }

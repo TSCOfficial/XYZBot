@@ -68,6 +68,10 @@ public class Ticket {
     @Getter
     private TicketStatus status;
 
+    @Getter
+    @Setter
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
     /**
      * Create a Ticket object<br>
      * Tickets are used within the Ticketsystem and every action for a Ticket or its TextChannel are controlled here.
@@ -128,7 +132,7 @@ public class Ticket {
      * @throws SQLException
      * @throws IllegalStateException When no close request can be sent
      */
-    public void requestClose() throws SQLException {
+    public void requestClose() throws SQLException, IllegalStateException {
         if (this.isClosable()){
             this.closeRequestCount ++;
             this.isRequestPending = true;
@@ -148,8 +152,10 @@ public class Ticket {
         if (this.isOwner(initiator)) {
             this.setPendingRequest(false);
             return;
+        } else {
+            throw new PermissionException("Du bist nicht dazu Berechtigt diese Aktion auszuführen.\n-# Nur der Ticketinhaber kann dies machen!");
         }
-        throw new PermissionException("Du bist nicht dazu Berechtigt diese Aktion auszuführen.\n-# Nur der Ticketinhaber kann dies machen!");
+
     }
 
     /**
@@ -161,6 +167,7 @@ public class Ticket {
     public void acceptCloseRequest(Member initiator) throws PermissionException, SQLException {
         if (this.isOwner(initiator)) {
             this.close(initiator);
+            return;
         }
         throw new PermissionException("Du bist nicht dazu Berechtigt diese Aktion auszuführen.\n-# Nur der Ticketinhaber kann dies machen!");
     }
@@ -202,8 +209,9 @@ public class Ticket {
         }
     }
 
-    public void delete() {
-        // transkript
+    public void delete() throws SQLException{
+        this.getChannel().delete().queue();
+        TicketRepository.deleteTicket(this);
     }
 
      // https://github.com/omardiaadev/discord-html-transcript-jda
@@ -257,6 +265,8 @@ public class Ticket {
     }
 
     public boolean isOwner(Member initiator){
+        log.debug(String.valueOf(initiator.getIdLong()));
+        log.debug(String.valueOf(owner.getIdLong()));
         return initiator.getIdLong() == owner.getIdLong();
     }
 

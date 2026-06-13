@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.interaction.command;
 
 import ch.frily.xyzbot.interaction.command.cmd.FindCmd;
+import ch.frily.xyzbot.interaction.command.cmd.SendContainerCmd;
 import ch.frily.xyzbot.interaction.command.cmd.TeamlistCmd;
 import ch.frily.xyzbot.interaction.command.cmd.TicketCmdGroup;
 import ch.frily.xyzbot.util.EnvKey;
@@ -41,7 +42,8 @@ public class SlashCommandRegistry {
     public void loadCommands() {
         List<ISlashCommand> slashCommands = List.of(
                 new FindCmd(),
-                new TeamlistCmd()
+                new TeamlistCmd(),
+                new SendContainerCmd()
         );
 
         List<ISlashCommandGroup> slashCommandGroups = List.of(

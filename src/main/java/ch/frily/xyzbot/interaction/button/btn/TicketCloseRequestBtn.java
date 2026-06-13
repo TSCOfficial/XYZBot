@@ -59,7 +59,7 @@ public class TicketCloseRequestBtn implements IButton {
             event.getHook().sendMessage(assigneeMention).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
 
             event.getMessage().editMessageComponents(MessageUtil.disableAllMessageComponents(event.getMessage())).queue();
-        } catch (SQLException | NotFoundException exception) {
+        } catch (SQLException | NotFoundException | IllegalStateException exception) {
             event.getHook().editOriginal(exception.getMessage()).queue();
         }
     }

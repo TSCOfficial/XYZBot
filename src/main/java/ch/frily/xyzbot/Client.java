@@ -78,7 +78,7 @@ public class Client {
      */
     private JDA createClient() throws SQLException {
         JDABuilder jdaBuilder = JDABuilder.createDefault(config.get("CRED_TOKEN"));
-        jdaBuilder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS);
+        jdaBuilder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT);
         jdaBuilder.setStatus(OnlineStatus.IDLE);
         jdaBuilder.setMemberCachePolicy(MemberCachePolicy.ALL);
         jdaBuilder.setActivity(Activity.customStatus("Lasset die neue Ära beginnen!"));

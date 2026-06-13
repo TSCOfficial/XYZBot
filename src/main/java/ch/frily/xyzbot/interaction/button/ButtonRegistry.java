@@ -32,7 +32,8 @@ public class ButtonRegistry {
                 new TicketCloseRequestAcceptBtn(),
                 new TicketCloseRequestRejectBtn(),
                 new TicketArchiveBtn(),
-                new TicketCloseRequestBtn()
+                new TicketCloseRequestBtn(),
+                new TicketDeleteBtn()
         );
         rawButtons.forEach(btn -> {
             String idOrUrl = btn.getId();

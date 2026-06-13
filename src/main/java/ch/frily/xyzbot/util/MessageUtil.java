@@ -49,4 +49,12 @@ public class MessageUtil {
     public static List<ActionRow> enableAllMessageComponents(Message message){
         return toggleAllMessageComponentDisableableState(message, false);
     }
+
+    public static String format(String template, Object... args) {
+        int i = 0;
+        while (template.contains("{}") && i < args.length) {
+            template = template.replaceFirst("\\{\\}", String.valueOf(args[i++]));
+        }
+        return template;
+    }
 }
