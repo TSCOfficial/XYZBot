@@ -3,10 +3,16 @@ package ch.frily.xyzbot.container;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.section.Section;
+import net.dv8tion.jda.api.components.section.SectionAccessoryComponent;
+import net.dv8tion.jda.api.components.section.SectionContentComponent;
+import net.dv8tion.jda.api.components.separator.Separator;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -19,6 +25,10 @@ public abstract class Container {
     @Getter
     @Setter
     private List<net.dv8tion.jda.api.components.container.Container> containers = new ArrayList<>();
+
+    @Getter
+    @Setter
+    private Color color;
 
     /**
      * Add a component to the container<br>
@@ -45,37 +55,64 @@ public abstract class Container {
         return this.components;
     }
 
+    /**
+     * Add a {@link TextDisplay} component
+     * @param text
+     * @return
+     */
+    public List<ContainerChildComponent> addTextDisplay(String text){
+        return addComponent(TextDisplay.of(text));
+    }
+
+    public List<ContainerChildComponent> addSection(SectionAccessoryComponent accessory, SectionContentComponent... components){
+        return addComponent(Section.of(accessory, Arrays.asList(components)));
+    }
+
+    /**
+     * Add a (invisible) separator
+     * @return
+     */
+    public List<ContainerChildComponent> addInvisibleSeparator(Separator.Spacing spacing){
+        return addComponent(Separator.createInvisible(spacing));
+    }
+
+    /**
+     * Add a (visible) divider
+     * @return
+     */
+    public List<ContainerChildComponent> addLineSeparator(Separator.Spacing spacing){
+        return addComponent(Separator.createDivider(spacing));
+    }
+
     public List<net.dv8tion.jda.api.components.container.Container> addContainer(net.dv8tion.jda.api.components.container.Container container){
         this.containers.add(container);
         return this.containers;
     }
 
     public List<net.dv8tion.jda.api.components.container.Container> build() {
-        log.debug("Building containers...");
         if (!components.isEmpty()) {
-            log.debug("Components detected: {}", components.size());
             List<ContainerChildComponent> newComponents = new ArrayList<>();
 
             for (int i = 0; i < components.size(); i++) {
                 if (i > 0 && i % 40 == 0) {
-                    log.debug("Triggered new container");
                     net.dv8tion.jda.api.components.container.Container newContainer =
                             net.dv8tion.jda.api.components.container.Container.of(newComponents);
+                    newContainer = newContainer.withAccentColor(color);
                     containers.add(newContainer);
                     newComponents.clear();
                 }
                 newComponents.add(components.get(i));
             }
 
-            // Add any remaining components to a new container
+            // Add remaining components to new container
             if (!newComponents.isEmpty()) {
-                log.debug("Adding remaining components as a new container");
                 net.dv8tion.jda.api.components.container.Container newContainer =
                         net.dv8tion.jda.api.components.container.Container.of(newComponents);
+                newContainer = newContainer.withAccentColor(color);
                 containers.add(newContainer);
             }
         }
-        log.debug("Returning containers: {}", containers.size());
+
         return containers;
     }
 

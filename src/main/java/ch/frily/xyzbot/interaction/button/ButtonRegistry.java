@@ -27,7 +27,7 @@ public class ButtonRegistry {
     public void loadButtons() {
         List<IButton> rawButtons = List.of(
                 new TicketPanelSupportBtn(),
-                new TicketPanelBewerbungButton(),
+                new TicketPanelBewerbungBtn(),
                 new TicketPanelLeitungBtn(),
                 new TicketCloseRequestAcceptBtn(),
                 new TicketCloseRequestRejectBtn(),

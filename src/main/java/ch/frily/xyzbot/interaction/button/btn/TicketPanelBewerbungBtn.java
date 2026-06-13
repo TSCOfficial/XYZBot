@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class TicketPanelBewerbungButton implements IButton {
+public class TicketPanelBewerbungBtn implements IButton {
 
     @Override
     public String getId() {
@@ -16,7 +16,7 @@ public class TicketPanelBewerbungButton implements IButton {
 
     @Override
     public String getLabel() {
-        return "Bewerbung";
+        return "Bewerbung öffnen";
     }
 
     @Override

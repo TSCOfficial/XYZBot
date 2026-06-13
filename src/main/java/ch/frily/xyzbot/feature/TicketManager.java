@@ -1,7 +1,11 @@
 package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.embed.TicketOpenEmbed;
+import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestBtn;
+import ch.frily.xyzbot.interaction.button.btn.TicketPanelBewerbungBtn;
+import ch.frily.xyzbot.interaction.button.btn.TicketPanelLeitungBtn;
+import ch.frily.xyzbot.interaction.button.btn.TicketPanelSupportBtn;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import javassist.NotFoundException;
@@ -110,6 +114,14 @@ public class TicketManager {
             throw new PermissionException("Du bist nicht berechtigt dies auszuführen");
         }
 
+    }
+
+    public IButton getButtonByTypeGroup(TicketTypeGroup typeGroup){
+        return switch (typeGroup) {
+            case SUPPORT -> new TicketPanelSupportBtn();
+            case BEWERBUNG -> new TicketPanelBewerbungBtn();
+            case LEITUNG -> new TicketPanelLeitungBtn();
+        };
     }
 
 }

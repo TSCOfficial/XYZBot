@@ -16,7 +16,7 @@ public class TicketPanelLeitungBtn implements IButton {
 
     @Override
     public String getLabel() {
-        return "Leitung";
+        return "Leitung öffnen";
     }
 
     @Override

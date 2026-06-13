@@ -12,7 +12,8 @@ import java.util.List;
  */
 public enum StaticContainerRegistry {
 
-    RULES(new RulesContainer().build());
+    RULES(new RulesContainer().build()),
+    TICKET_PANEL(new TicketPanelContainer().build());
 
     @Getter
     private final List<Container> containers;
