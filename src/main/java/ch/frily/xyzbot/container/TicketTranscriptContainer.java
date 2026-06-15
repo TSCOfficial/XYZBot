@@ -8,9 +8,7 @@ import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.w3c.dom.Text;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Slf4j
@@ -31,7 +29,7 @@ public class TicketTranscriptContainer extends Container {
         this.addComponent(TextDisplay.of(MessageUtil.format("**Gelöscht von**: {} (@{})", initiator.getAsMention(), initiator.getUser().getName())));
 
         long epochTimeCreated = ticket.getChannel().getTimeCreated().toEpochSecond();
-        String opendTimeSinceCreation = MessageUtil.duration(ticket.getChannel().getTimeCreated(), OffsetDateTime.now());
+        String opendTimeSinceCreation = MessageUtil.calcDuration(ticket.getChannel().getTimeCreated(), OffsetDateTime.now());
         this.addComponent(TextDisplay.of(MessageUtil.format("**Geöffnet am**: <t:{}:F> ({})", epochTimeCreated, opendTimeSinceCreation)));
         this.addComponent(Separator.createDivider(Separator.Spacing.LARGE));
         this.addComponent(FileDisplay.fromFile(transkript));

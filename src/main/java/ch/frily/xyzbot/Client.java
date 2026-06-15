@@ -53,6 +53,15 @@ public class Client {
     public void setup() {
         try {
             config = loadConfig();
+
+            Connection conn = Database.getInstance().connect();
+            if (conn != null) {
+                log.info("Database connected!");
+            } else {
+                throw new SQLException("Database could not be reached!");
+            }
+            Database.getInstance().disconnect();
+
             client = createClient();
             client.awaitReady();
             log.info("Application started successfully!");
@@ -82,14 +91,6 @@ public class Client {
         jdaBuilder.setStatus(OnlineStatus.IDLE);
         jdaBuilder.setMemberCachePolicy(MemberCachePolicy.ALL);
         jdaBuilder.setActivity(Activity.customStatus("Lasset die neue Ära beginnen!"));
-
-        Connection conn = Database.getInstance().connect();
-        if (conn != null) {
-            log.info("Database connected!");
-        } else {
-            throw new SQLException("Database could not be reached!");
-        }
-        Database.getInstance().disconnect();
 
         // Event listeners
         jdaBuilder.addEventListeners(InteractionListener.getInstance());

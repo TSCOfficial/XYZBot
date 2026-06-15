@@ -2,14 +2,8 @@ package ch.frily.xyzbot.util;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.components.ActionComponent;
-import net.dv8tion.jda.api.components.Component;
-import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
-import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.label.LabelChildComponent;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.internal.components.actionrow.ActionRowImpl;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,7 +11,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class MessageUtil {
@@ -69,7 +62,7 @@ public class MessageUtil {
         return formattedDate;
     }
 
-    public static String duration(Temporal startInclusive, Temporal endExclusive){
+    public static String calcDuration(Temporal startInclusive, Temporal endExclusive){
         Duration duration = Duration.between(startInclusive, endExclusive);
 
         long days = duration.toDays();
