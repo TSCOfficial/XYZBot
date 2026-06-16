@@ -1,0 +1,40 @@
+package ch.frily.xyzbot.interaction.modal;
+
+import ch.frily.xyzbot.interaction.modal.modal.TicketTypeSelectorModal;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+public class ModalRegistry {
+
+    private static ModalRegistry instance;
+
+    private Map<String, IModal> modals = new HashMap<>();
+
+    public static ModalRegistry getInstance(){
+        if (instance == null) {
+            instance = new ModalRegistry();
+        }
+        return instance;
+    }
+
+    public void loadModals(){
+        List<IModal> rawModals = List.of(
+                new TicketTypeSelectorModal()
+        );
+
+        rawModals.forEach(modal -> {
+            log.info("Loaded modal with id {}", modal.getId());
+            modals.put(modal.getId(), modal);
+        });
+    }
+
+    public void dispatchModalInteraction(ModalInteractionEvent event) {
+        log.debug("Modal interaction dispatched: {}", event.getModalId());
+        modals.get(event.getModalId()).execute(event);
+    }
+}
