@@ -4,8 +4,7 @@ import ch.frily.xyzbot.feature.TicketManager;
 import ch.frily.xyzbot.feature.TicketType;
 import ch.frily.xyzbot.feature.TicketTypeGroup;
 import ch.frily.xyzbot.util.Color;
-import ch.frily.xyzbot.util.EnvKey;
-import ch.frily.xyzbot.util.MessageUtil;
+import ch.frily.xyzbot.util.Util;
 import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 
@@ -23,12 +22,12 @@ public class TicketPanelContainer extends Container {
         Arrays.stream(TicketTypeGroup.values()).forEach(typeGroup -> {
 
             String groupCategories = Arrays.stream(TicketType.values()).filter(type -> type.getGroup() == typeGroup).map(type -> {
-                return MessageUtil.format("- {}", type.getLabel());
+                return Util.format("- {}", type.getLabel());
             }).collect(Collectors.joining("\n"));
 
             this.addSection(
                     TicketManager.getInstance().getButtonByTypeGroup(typeGroup).build(),
-                    TextDisplay.of(MessageUtil.format("### {}", typeGroup.getLabel())),
+                    TextDisplay.of(Util.format("### {}", typeGroup.getLabel())),
                     TextDisplay.of(typeGroup.getDescription())
             );
             this.addTextDisplay("**Verfügbare Kategorien:**");

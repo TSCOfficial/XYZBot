@@ -25,17 +25,11 @@ public class OnMessageReceived extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        try {
-            if (event.getAuthor().isBot()) return;
-            log.debug("Message received");
-            if (TicketManager.getInstance().isTicketchannel(event.getChannel().asTextChannel())){
-                Ticket ticket = TicketRepository.getTicketById(event.getChannel().getIdLong());
-                ticket.claim(event.getMember());
+        if (event.getAuthor().isBot()) return;
 
-                log.debug("Ticket claimed by {}", event.getMember().getEffectiveName());
-            }
-        } catch (SQLException | NotFoundException exception) {
-            log.error(exception.getMessage());
+        if (TicketManager.getInstance().isTicketchannel(event.getChannel().asTextChannel())){
+            Ticket ticket = TicketRepository.getTicketById(event.getChannel().getIdLong());
+            ticket.claim(event.getMember());
         }
     }
 

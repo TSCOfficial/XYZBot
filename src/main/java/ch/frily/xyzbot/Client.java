@@ -1,6 +1,7 @@
 package ch.frily.xyzbot;
 
 import ch.frily.xyzbot.database.Database;
+import ch.frily.xyzbot.exception.ExceptionHandler;
 import ch.frily.xyzbot.interaction.button.ButtonRegistry;
 import ch.frily.xyzbot.interaction.modal.ModalRegistry;
 import ch.frily.xyzbot.listener.InteractionListener;
@@ -73,11 +74,8 @@ public class Client {
             ButtonRegistry.getInstance().loadButtons();
             ModalRegistry.getInstance().loadModals();
 
-        } catch (InterruptedException interruptedException) {
-            log.error(interruptedException.getMessage());
-        } catch (SQLException sqlException) {
-            log.error("SQLState: {}", sqlException.getSQLState());
-            log.error(sqlException.getMessage());
+        } catch (Exception exception) {
+            ExceptionHandler.handle(exception);
         }
     }
 
@@ -85,7 +83,7 @@ public class Client {
      * Creates the JDA clientUSE
      * @return New JDA client
      */
-    private JDA createClient() throws SQLException {
+    private JDA createClient() {
         JDABuilder jdaBuilder = JDABuilder.createDefault(config.get("CRED_TOKEN"));
         jdaBuilder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT);
         jdaBuilder.setStatus(OnlineStatus.IDLE);

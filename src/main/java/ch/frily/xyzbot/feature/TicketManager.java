@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.feature;
 
 import ch.frily.xyzbot.embed.TicketOpenEmbed;
+import ch.frily.xyzbot.exception.PermissionDeniedException;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketPanelBewerbungBtn;
@@ -84,15 +85,9 @@ public class TicketManager {
      * Checks if the {@link TextChannel} is a Ticket or nor
      * @return True if its a Ticketchannel / False if not
      */
-    public boolean isTicketchannel(TextChannel channel) throws SQLException {
-        try {
-            TicketRepository.getTicketById(channel.getIdLong());
-            return true;
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        } catch (NotFoundException e) {
-            return false;
-        }
+    public boolean isTicketchannel(TextChannel channel) {
+        TicketRepository.getTicketById(channel.getIdLong());
+        return true;
     }
 
     /**
@@ -111,7 +106,7 @@ public class TicketManager {
      */
     private void isPermitted(TicketType type, Member ticketOwner){
         if (type == TicketType.BEWERBUNG_SUPPORT || type == TicketType.BEWERBUNG_EVENTTEAM) { // sup + event bewerbungen temporär gesperrt, bis das ganze System steht
-            throw new PermissionException("Du bist nicht berechtigt dies auszuführen");
+            throw new PermissionDeniedException("Diese Kategorie ist momentan gesperrt.");
         }
 
     }

@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.container.TicketTranscriptContainer;
+import ch.frily.xyzbot.exception.ExceptionHandler;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
@@ -44,26 +45,15 @@ public class TicketDeleteBtn implements IButton {
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
         event.deferReply().queue();
-        try {
-            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-            ticket.generateTranscript().thenAccept(fileUpload -> {
-                fileUpload.setName("transkript-" + ticket.getNameWithoutStatus());
-                TextChannel logChannel = EnvResolver.getChannelById(TextChannel.class, EnvKey.GUILD_XYZCRAFT, EnvKey.CHANNEL_TICKETTRANSKRIPT);
-                List<Container> containers = new TicketTranscriptContainer(event.getMember(), ticket, fileUpload).build();
-                logChannel.sendMessageComponents(containers).useComponentsV2().addFiles(fileUpload).setAllowedMentions(List.of()).queue();
 
-                try {
-                    ticket.delete();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }).exceptionally(throwable -> {
-                log.error(throwable.getMessage());
-                return null;
-            });
+        Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+        ticket.generateTranscript().thenAccept(fileUpload -> {
+            fileUpload.setName("transkript-" + ticket.getNameWithoutStatus());
+            TextChannel logChannel = EnvResolver.getChannelById(TextChannel.class, EnvKey.GUILD_XYZCRAFT, EnvKey.CHANNEL_TICKETTRANSKRIPT);
+            List<Container> containers = new TicketTranscriptContainer(event.getMember(), ticket, fileUpload).build();
+            logChannel.sendMessageComponents(containers).useComponentsV2().addFiles(fileUpload).setAllowedMentions(List.of()).queue();
 
-        } catch (SQLException | NotFoundException e) {
-            event.getHook().sendMessage(e.getMessage() + "\n\n-# Versuche es später erneut oder frag ein*e Administrator*in das Ticket zu löschen").queue();
-        }
+            ticket.delete();
+        }).exceptionally(throwable -> ExceptionHandler.fail(throwable, event));
     }
 }

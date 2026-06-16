@@ -1,10 +1,9 @@
 package ch.frily.xyzbot.listener;
 
+import ch.frily.xyzbot.exception.ExceptionHandler;
 import ch.frily.xyzbot.interaction.button.ButtonRegistry;
 import ch.frily.xyzbot.interaction.modal.ModalRegistry;
 import ch.frily.xyzbot.interaction.command.SlashCommandRegistry;
-import ch.frily.xyzbot.util.MessageUtil;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -33,8 +32,8 @@ public class InteractionListener extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             SlashCommandRegistry.getInstance().dispatchInteractionEvent(event);
-        } catch (NotFoundException notFoundException) {
-            event.reply(notFoundException.getMessage()).setEphemeral(true).queue();
+        } catch (Exception exception) {
+            ExceptionHandler.handle(exception, event);
         }
     }
 
@@ -44,7 +43,11 @@ public class InteractionListener extends ListenerAdapter {
      */
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        SlashCommandRegistry.getInstance().dispatchAutocompleteEvent(event);
+        try {
+            SlashCommandRegistry.getInstance().dispatchAutocompleteEvent(event);
+        } catch (Exception exception) {
+            ExceptionHandler.handle(exception);
+        }
     }
 
     @Override
@@ -52,8 +55,7 @@ public class InteractionListener extends ListenerAdapter {
         try {
             ButtonRegistry.getInstance().dispatchButtonInteraction(event);
         } catch (Exception exception) {
-            log.error(exception.getMessage());
-            exception.printStackTrace();
+            ExceptionHandler.handle(exception, event);
         }
     }
 
@@ -62,7 +64,7 @@ public class InteractionListener extends ListenerAdapter {
         try {
             ModalRegistry.getInstance().dispatchModalInteraction(event);
         } catch (Exception exception) {
-            log.error(exception.getMessage());
+            ExceptionHandler.handle(exception, event);
         }
     }
 

@@ -1,10 +1,10 @@
 package ch.frily.xyzbot.interaction.button.btn;
 
 import ch.frily.xyzbot.embed.TicketCloseRequestEmbed;
+import ch.frily.xyzbot.exception.ExceptionHandler;
 import ch.frily.xyzbot.feature.Ticket;
 import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
-import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -40,24 +40,21 @@ public class TicketCloseRequestBtn implements IButton {
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
         event.deferReply().queue();
-        try {
-            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-            ticket.requestClose(event.getUser());
 
-            ActionRow actionRow = ActionRow.of(
-                    new TicketCloseRequestAcceptBtn().build(),
-                    new TicketCloseRequestRejectBtn().build()
-            );
+        Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+        ticket.requestClose(event.getUser());
 
-            TicketCloseRequestEmbed optionsEmbed = new TicketCloseRequestEmbed();
-            optionsEmbed.setInitiator(event.getMember());
-            optionsEmbed.setTicket(ticket);
+        ActionRow actionRow = ActionRow.of(
+                new TicketCloseRequestAcceptBtn().build(),
+                new TicketCloseRequestRejectBtn().build()
+        );
 
-            event.getHook().sendMessage(ticket.getOwner().getAsMention()).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+        TicketCloseRequestEmbed optionsEmbed = new TicketCloseRequestEmbed();
+        optionsEmbed.setInitiator(event.getMember());
+        optionsEmbed.setTicket(ticket);
 
-            event.getMessage().editMessageComponents(MessageUtil.disableAllMessageComponents(event.getMessage())).queue();
-        } catch (SQLException | NotFoundException | IllegalStateException | PermissionException exception) {
-            event.getHook().editOriginal(exception.getMessage()).queue();
-        }
+        event.getHook().sendMessage(ticket.getOwner().getAsMention()).addEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+
+        event.getMessage().editMessageComponents(event.getMessage().getComponentTree().asDisabled()).queue();
     }
 }

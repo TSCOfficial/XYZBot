@@ -48,14 +48,10 @@ public class Database {
      * Connect to the database
      * @return The database connection
      */
-    public Connection connect() {
+    public Connection connect() throws ClassNotFoundException, SQLException {
         if (connection == null) {
-            try {
-                Class.forName(DATABASE_DRIVER);
-                connection = DriverManager.getConnection(DATABASE_URL, getProperties());
-            } catch (ClassNotFoundException | SQLException e) {
-                System.out.println(e);
-            }
+            Class.forName(DATABASE_DRIVER);
+            connection = DriverManager.getConnection(DATABASE_URL, getProperties());
         }
         return connection;
     }
@@ -63,14 +59,10 @@ public class Database {
     /**
      * Disconnect the current database connection
      */
-    public void disconnect() {
+    public void disconnect() throws SQLException {
         if (connection != null) {
-            try {
-                connection.close();
-                connection = null;
-            } catch (SQLException e) {
-                System.out.println(e);
-            }
+            connection.close();
+            connection = null;
         }
     }
 

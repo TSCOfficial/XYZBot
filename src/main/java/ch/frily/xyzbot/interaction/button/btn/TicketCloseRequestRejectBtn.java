@@ -5,7 +5,6 @@ import ch.frily.xyzbot.feature.TicketRepository;
 import ch.frily.xyzbot.interaction.button.IButton;
 import ch.frily.xyzbot.embed.TicketCloseRejectedEmbed;
 import ch.frily.xyzbot.util.EnvResolver;
-import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,25 +45,21 @@ public class TicketCloseRequestRejectBtn implements IButton {
     @Override
     public void execute(@NotNull ButtonInteractionEvent event) {
 
-        try {
-            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
-            ticket.rejectCloseRequest(event.getMember());
+        Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+        ticket.rejectCloseRequest(event.getMember());
 
-            TicketCloseRejectedEmbed embed = new TicketCloseRejectedEmbed();
-            embed.setMember(event.getMember());
-            embed.setTicket(ticket);
+        TicketCloseRejectedEmbed embed = new TicketCloseRejectedEmbed();
+        embed.setMember(event.getMember());
+        embed.setTicket(ticket);
 
-            event.editMessageEmbeds(embed.build())
-                    .setComponents(MessageUtil.disableAllMessageComponents(event.getMessage()))
-                    .queue();
+        event.editMessageEmbeds(embed.build())
+                .setComponents(event.getMessage().getComponentTree().asDisabled())
+                .queue();
 
-            CompletableFuture<Message> welcomeMessage = EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId());
-            welcomeMessage.thenAccept(message -> {
-              message.editMessageComponents(MessageUtil.enableAllMessageComponents(message)).queue();
-            });
-        } catch (SQLException | NotFoundException sqlException){
-            event.getHook().editOriginal(sqlException.getMessage()).queue();
-        }
+        CompletableFuture<Message> welcomeMessage = EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId());
+        welcomeMessage.thenAccept(message -> {
+          message.editMessageComponents(message.getComponentTree().asEnabled()).queue();
+        });
 
     }
 }

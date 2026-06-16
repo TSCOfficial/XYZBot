@@ -12,13 +12,15 @@ public enum Table {
     private final Class<? extends Column> columnClass;
 
     /**
-     * Common interface
+     * Common Table interface
      */
     public interface Column {
         String getColumn();
     }
 
-    // TICKET
+    /**
+     * Ticket table columns
+     */
     @Getter
     @RequiredArgsConstructor
     public enum TicketColumn implements Column {
@@ -33,6 +35,7 @@ public enum Table {
         CLOSE_REQUEST_COUNT("close_request_count"),
         STATUS("status"),
         UPDATED_AT("updated_at");
+
         private final String column;
     }
 }

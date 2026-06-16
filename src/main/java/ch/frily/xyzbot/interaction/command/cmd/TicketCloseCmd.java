@@ -9,7 +9,6 @@ import ch.frily.xyzbot.interaction.button.btn.TicketCloseRequestRejectBtn;
 import ch.frily.xyzbot.interaction.button.btn.TicketDeleteBtn;
 import ch.frily.xyzbot.interaction.command.ISlashSubcommand;
 import ch.frily.xyzbot.util.EnvResolver;
-import ch.frily.xyzbot.util.MessageUtil;
 import javassist.NotFoundException;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -41,45 +40,40 @@ public class TicketCloseCmd implements ISlashSubcommand {
 
     @Override
     public void execute(@NotNull SlashCommandInteractionEvent event) {
-        try {
-            Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
+        Ticket ticket = TicketRepository.getTicketById(event.getChannelIdLong());
 
-            if (event.getOption("force") != null && event.getOption("force").getAsBoolean()) {
-                if (ticket.isForceClosable()) {
-                    ActionRow actionRow = ActionRow.of(
-                            new TicketDeleteBtn().build()
-                    );
-                    ticket.close(event.getMember());
-
-                    TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
-                    optionsEmbed.setTicket(ticket);
-                    optionsEmbed.setForcedClosed(true);
-                    event.replyEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
-                    return;
-                }
-                event.reply("❌ Ticket kann nicht geschlossen werden.\n-# Es müssen erst min. 2 Anfragen gestellt werden oder 7 Tage inaktivität.").setEphemeral(true).queue();
-                return;
-            } else {
+        if (event.getOption("force") != null && event.getOption("force").getAsBoolean()) {
+            if (ticket.isForceClosable()) {
                 ActionRow actionRow = ActionRow.of(
-                        new TicketCloseRequestAcceptBtn().build(),
-                        new TicketCloseRequestRejectBtn().build()
+                        new TicketDeleteBtn().build()
                 );
+                ticket.close(event.getMember());
 
-                ticket.requestClose(event.getUser());
-
-                TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
-                requestEmbed.setInitiator(event.getMember());
-                requestEmbed.setTicket(ticket);
-                event.replyEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
-
-                // Disable welcome message component
-                EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId()).thenAccept(message -> {
-                    message.editMessageComponents(MessageUtil.disableAllMessageComponents(message)).queue();
-                });
+                TicketClosedOptionsEmbed optionsEmbed = new TicketClosedOptionsEmbed();
+                optionsEmbed.setTicket(ticket);
+                optionsEmbed.setForcedClosed(true);
+                event.replyEmbeds(optionsEmbed.build()).setComponents(actionRow).queue();
+                return;
             }
+            throw new IllegalStateException("❌ Ticket kann nicht geschlossen werden.\n-# Es müssen erst min. 2 Anfragen gestellt werden oder 7 Tage inaktivität.");
 
-        } catch (SQLException | NotFoundException | IllegalStateException | PermissionException exception) {
-            event.reply(exception.getMessage()).queue();
+        } else {
+            ActionRow actionRow = ActionRow.of(
+                    new TicketCloseRequestAcceptBtn().build(),
+                    new TicketCloseRequestRejectBtn().build()
+            );
+
+            ticket.requestClose(event.getUser());
+
+            TicketCloseRequestEmbed requestEmbed = new TicketCloseRequestEmbed();
+            requestEmbed.setInitiator(event.getMember());
+            requestEmbed.setTicket(ticket);
+            event.replyEmbeds(requestEmbed.build()).setComponents(actionRow).queue();
+
+            // Disable welcome message component
+            EnvResolver.getMessageById(event.getGuild().getIdLong(), ticket.getChannel().getIdLong(), ticket.getWelcomeMessageId()).thenAccept(message -> {
+                message.editMessageComponents(message.getComponentTree().asDisabled()).queue();
+            });
         }
     }
 }
