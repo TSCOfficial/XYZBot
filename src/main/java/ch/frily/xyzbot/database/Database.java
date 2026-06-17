@@ -1,6 +1,7 @@
 package ch.frily.xyzbot.database;
 
 import ch.frily.xyzbot.Client;
+import ch.frily.xyzbot.exception.ExceptionHandler;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 
@@ -48,21 +49,29 @@ public class Database {
      * Connect to the database
      * @return The database connection
      */
-    public Connection connect() throws ClassNotFoundException, SQLException {
-        if (connection == null) {
-            Class.forName(DATABASE_DRIVER);
-            connection = DriverManager.getConnection(DATABASE_URL, getProperties());
+    public Connection connect() {
+        try {
+            if (connection == null) {
+                Class.forName(DATABASE_DRIVER);
+                connection = DriverManager.getConnection(DATABASE_URL, getProperties());
+            }
+            return connection;
+        } catch (Exception exception) {
+            return ExceptionHandler.fail(exception);
         }
-        return connection;
     }
 
     /**
      * Disconnect the current database connection
      */
-    public void disconnect() throws SQLException {
-        if (connection != null) {
-            connection.close();
-            connection = null;
+    public void disconnect() {
+        try {
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
+        } catch (Exception exception) {
+            ExceptionHandler.handle(exception);
         }
     }
 

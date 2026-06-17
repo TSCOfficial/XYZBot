@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
+import java.util.regex.*;
 
 @Slf4j
 @UtilityClass
@@ -45,4 +46,16 @@ public final class Util {
 
         return openDuration;
     }
+
+    public static boolean hasEmoji(String text) {
+        return text.codePoints()
+                .anyMatch(Character::isEmojiPresentation);
+    }
+
+    public static Matcher getEmojis(String text) {
+        Pattern pattern = Pattern.compile("\\p{IsEmoji_Presentation}");
+        return pattern.matcher(text);
+    }
+
+
 }

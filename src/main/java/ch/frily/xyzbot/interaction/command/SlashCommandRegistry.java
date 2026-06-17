@@ -1,9 +1,6 @@
 package ch.frily.xyzbot.interaction.command;
 
-import ch.frily.xyzbot.interaction.command.cmd.FindCmd;
-import ch.frily.xyzbot.interaction.command.cmd.SendContainerCmd;
-import ch.frily.xyzbot.interaction.command.cmd.TeamlistCmd;
-import ch.frily.xyzbot.interaction.command.cmd.TicketCmdGroup;
+import ch.frily.xyzbot.interaction.command.cmd.*;
 import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import javassist.NotFoundException;
@@ -43,7 +40,8 @@ public class SlashCommandRegistry {
         List<ISlashCommand> slashCommands = List.of(
                 new FindCmd(),
                 new TeamlistCmd(),
-                new SendContainerCmd()
+                new SendContainerCmd(),
+                new TeamNaming()
         );
 
         List<ISlashCommandGroup> slashCommandGroups = List.of(
