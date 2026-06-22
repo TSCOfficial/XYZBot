@@ -41,7 +41,8 @@ public class SlashCommandRegistry {
                 new FindCmd(),
                 new TeamlistCmd(),
                 new SendContainerCmd(),
-                new TeamNaming()
+                new TeamNaming(),
+                new ExcelCmd()
         );
 
         List<ISlashCommandGroup> slashCommandGroups = List.of(
@@ -62,7 +63,7 @@ public class SlashCommandRegistry {
     }
 
     public void registerAll() {
-        Guild guild = EnvResolver.getGuildById(EnvKey.GUILD_XYZCRAFT);
+        Guild guild = EnvResolver.getGuildById(1004035867679129662L); // replace back to xyzcraft later
         List<CommandData> commandDataList = new ArrayList<>();
 
         commands.forEach((name, cmd) -> {
