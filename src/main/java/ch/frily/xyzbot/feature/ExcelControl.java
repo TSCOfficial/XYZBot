@@ -123,7 +123,7 @@ public class ExcelControl {
 
                 String typeName = getCellString(row, 1).trim();
                 String name = getCellString(row, 2).trim();
-                String description = getCellString(row, 3).trim();
+                String description = getCellString(row, 3).trim().replace("\\n", "\n");
                 String channelId = getCellString(row, 4).trim();
 
                 if (name.isBlank()) {
