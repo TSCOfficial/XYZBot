@@ -1,7 +1,6 @@
 package ch.frily.xyzbot.interaction.command;
 
 import ch.frily.xyzbot.interaction.command.cmd.*;
-import ch.frily.xyzbot.util.EnvKey;
 import ch.frily.xyzbot.util.EnvResolver;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +40,12 @@ public class SlashCommandRegistry {
                 new FindCmd(),
                 new TeamlistCmd(),
                 new SendContainerCmd(),
-                new TeamNaming(),
-                new ExcelCmd()
+                new TeamNaming()
         );
 
         List<ISlashCommandGroup> slashCommandGroups = List.of(
-            new TicketCmdGroup()
+                new TicketCmdGroup(),
+                new ExcelCmdGroup()
         );
 
         slashCommands.forEach(cmd -> {

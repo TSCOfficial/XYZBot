@@ -2,16 +2,17 @@ package ch.frily.xyzbot.interaction.command.cmd;
 
 import ch.frily.xyzbot.feature.ExcelControl;
 import ch.frily.xyzbot.interaction.command.ISlashCommand;
+import ch.frily.xyzbot.interaction.command.ISlashSubcommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class ExcelCmd implements ISlashCommand {
+public class ExcelExportCmd implements ISlashSubcommand {
     @Override
     public String getName() {
-        return "excel";
+        return "export";
     }
 
     @Override

@@ -6,6 +6,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.managers.channel.ChannelManager;
+import net.dv8tion.jda.api.managers.channel.concrete.ForumChannelManager;
+import net.dv8tion.jda.api.managers.channel.concrete.NewsChannelManager;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -19,6 +23,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,6 +83,189 @@ public class ExcelControl {
         workbook.write(out);
 
         return FileUpload.fromData(out.toByteArray(), "channels.xlsx");
+    }
+
+    /**
+     * Reads an uploaded channel Excel file and applies every row that has Sync = true
+     * back to Discord. Rows with an existing channel-ID (hidden column E) are updated,
+     * rows without one are created as new channels using the selected type.
+     *
+     * @param inputStream the uploaded .xlsx file stream
+     * @return a human-readable summary of what was done
+     * @throws IOException if the file cannot be read
+     */
+    public String importExcel(InputStream inputStream) throws IOException {
+        Guild guild = EnvResolver.getGuildById(1004035867679129662L);
+
+        List<String> log = new ArrayList<>();
+        int created = 0;
+        int updated = 0;
+        int skipped = 0;
+
+        try (Workbook importWorkbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = importWorkbook.getSheet(SHEET_NAME);
+            if (sheet == null) {
+                throw new IOException("Das Tabellenblatt \"" + SHEET_NAME + "\" wurde nicht gefunden.");
+            }
+
+            // Skip header row (row 0)
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (isRowEmpty(row)) {
+                    continue;
+                }
+
+                boolean sync = "true".equalsIgnoreCase(getCellString(row, 0).trim());
+                if (!sync) {
+                    skipped++;
+                    continue;
+                }
+
+                String typeName = getCellString(row, 1).trim();
+                String name = getCellString(row, 2).trim();
+                String description = getCellString(row, 3).trim();
+                String channelId = getCellString(row, 4).trim();
+
+                if (name.isBlank()) {
+                    log.add("⚠️ Zeile " + (rowIndex + 1) + " übersprungen: kein Name angegeben.");
+                    skipped++;
+                    continue;
+                }
+
+                if (!channelId.isBlank()) {
+                    boolean ok = updateExistingChannel(guild, channelId, name, description, log, rowIndex);
+                    if (ok) {
+                        updated++;
+                    } else {
+                        skipped++;
+                    }
+                } else {
+                    boolean ok = createNewChannel(guild, typeName, name, description, log, rowIndex);
+                    if (ok) {
+                        created++;
+                    } else {
+                        skipped++;
+                    }
+                }
+            }
+        }
+
+        StringBuilder summary = new StringBuilder();
+        summary.append("✅ Import abgeschlossen.\n")
+                .append("• Erstellt: ").append(created).append("\n")
+                .append("• Aktualisiert: ").append(updated).append("\n")
+                .append("• Übersprungen: ").append(skipped);
+
+        if (!log.isEmpty()) {
+            summary.append("\n\n").append(String.join("\n", log));
+        }
+        return summary.toString();
+    }
+
+    /**
+     * Updates an existing channel's name and (if supported) its topic.
+     */
+    private boolean updateExistingChannel(Guild guild, String channelId, String name,
+                                          String description, List<String> log, int rowIndex) {
+        GuildChannel channel = guild.getGuildChannelById(channelId);
+        if (channel == null) {
+            log.add("⚠️ Zeile " + (rowIndex + 1) + ": Kanal mit ID " + channelId + " existiert nicht mehr.");
+            return false;
+        }
+
+        channel.getManager().setName(name).queue();
+        if (acceptsTopic(channel) && !description.isBlank()) {
+            applyTopic(channel, description);
+        }
+        return true;
+    }
+
+    /**
+     * Creates a new channel of the given type with name and (if supported) topic.
+     */
+    private boolean createNewChannel(Guild guild, String typeName, String name,
+                                     String description, List<String> log, int rowIndex) {
+        ChannelType type;
+        try {
+            type = ChannelType.valueOf(typeName);
+        } catch (IllegalArgumentException e) {
+            log.add("⚠️ Zeile " + (rowIndex + 1) + ": ungültiger Kanaltyp \"" + typeName + "\".");
+            return false;
+        }
+
+        switch (type) {
+            case TEXT -> guild.createTextChannel(name)
+                    .setTopic(description.isBlank() ? null : description)
+                    .queue();
+            case NEWS -> guild.createNewsChannel(name)
+                    .setTopic(description.isBlank() ? null : description)
+                    .queue();
+            case FORUM -> guild.createForumChannel(name)
+                    .setTopic(description.isBlank() ? null : description)
+                    .queue();
+            case VOICE -> guild.createVoiceChannel(name).queue();
+            case STAGE -> guild.createStageChannel(name).queue();
+            case CATEGORY -> guild.createCategory(name).queue();
+            default -> {
+                log.add("⚠️ Zeile " + (rowIndex + 1) + ": Kanaltyp \"" + typeName
+                        + "\" kann nicht erstellt werden.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Applies a topic via the channel manager, depending on the concrete channel type.
+     */
+    private void applyTopic(GuildChannel channel, String description) {
+        if (channel instanceof TextChannel textChannel) {
+            textChannel.getManager().setTopic(description).queue();
+        } else if (channel instanceof NewsChannel newsChannel) {
+            newsChannel.getManager().setTopic(description).queue();
+        } else if (channel instanceof ForumChannel forumChannel) {
+            forumChannel.getManager().setTopic(description).queue();
+        }
+    }
+
+    /**
+     * Returns the trimmed string value of a cell, or empty string if missing.
+     */
+    private String getCellString(Row row, int colIndex) {
+        if (row == null) {
+            return "";
+        }
+        Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        if (cell == null) {
+            return "";
+        }
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case NUMERIC -> {
+                // IDs are large numbers; avoid scientific notation
+                double value = cell.getNumericCellValue();
+                yield value == Math.floor(value)
+                        ? String.valueOf((long) value)
+                        : String.valueOf(value);
+            }
+            default -> "";
+        };
+    }
+
+    /**
+     * Whether a row has no meaningful content.
+     */
+    private boolean isRowEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        for (int c = 0; c < HEADERS.length; c++) {
+            if (!getCellString(row, c).isBlank()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
