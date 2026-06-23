@@ -21,10 +21,9 @@ public class ExcelCmd implements ISlashCommand {
 
     @Override
     public void execute(@NotNull SlashCommandInteractionEvent event) {
-        event.deferReply().queue();
         try {
-            FileUpload file = ExcelControl.generateExcel();
-            event.getHook().sendFiles(file).queue();
+            FileUpload file = ExcelControl.getInstance().generateExcel();
+            event.getChannel().sendFiles(file).queue();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

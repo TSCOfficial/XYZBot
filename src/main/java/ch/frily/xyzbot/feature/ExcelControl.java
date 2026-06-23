@@ -8,10 +8,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -23,19 +25,31 @@ import java.util.stream.Collectors;
 
 public class ExcelControl {
 
+    private static ExcelControl instance;
+
     private static final String SHEET_NAME = "Kanäle";
     private static final String[] HEADERS = {"Sync", "Typ", "Name", "Beschreibung", "Channel-ID"};
+
+    private Workbook workbook;
+
+    public static ExcelControl getInstance() {
+        if (instance == null) {
+            instance = new ExcelControl();
+        }
+        return instance;
+    }
 
     /**
      * Generate the Excel file for the channel list.
      * @return
      */
-    public static FileUpload generateExcel() throws IOException {
+    public FileUpload generateExcel() throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
+        this.workbook = workbook;
         XSSFSheet sheet = workbook.createSheet(SHEET_NAME);
 
-        CellStyle headerStyle = createHeaderStyle(workbook);
-        CellStyle emptyDescriptionStyle = createEmptyDescriptionStyle(workbook);
+        CellStyle headerStyle = createHeaderStyle();
+        CellStyle emptyDescriptionStyle = createEmptyDescriptionStyle();
 
         writeHeaderRow(sheet, headerStyle);
 
@@ -53,11 +67,11 @@ public class ExcelControl {
         addSyncConditionalFormatting(sheet, lastDataRow);
         addTypeDropdown(sheet, lastDataRow);
 
-        // Channel-ID-Spalte ausblenden, sie wird nur intern für den Re-Import benötigt
+        // Hide channel-ID column (only used for the import)
         sheet.setColumnHidden(4, true);
 
         autoSizeColumns(sheet);
-        sheet.createFreezePane(0, 1); // Header beim Scrollen fixieren
+        sheet.createFreezePane(0, 1); // Fix header
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);
@@ -67,10 +81,9 @@ public class ExcelControl {
 
     /**
      * Define the header style.
-     * @param workbook
      * @return
      */
-    private static CellStyle createHeaderStyle(Workbook workbook) {
+    private CellStyle createHeaderStyle() {
         CellStyle headerStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -85,10 +98,9 @@ public class ExcelControl {
      * greys the cell out. The actual "no value allowed" restriction is enforced
      * via a data validation rule (see addEmptyOnlyValidation), not via locking,
      * so no sheet protection is required.
-     * @param workbook
      * @return
      */
-    private static CellStyle createEmptyDescriptionStyle(Workbook workbook) {
+    private CellStyle createEmptyDescriptionStyle() {
         CellStyle style = workbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -100,7 +112,7 @@ public class ExcelControl {
      * @param sheet
      * @param headerStyle
      */
-    private static void writeHeaderRow(Sheet sheet, CellStyle headerStyle) {
+    private void writeHeaderRow(Sheet sheet, CellStyle headerStyle) {
         Row header = sheet.createRow(0);
         for (int i = 0; i < HEADERS.length; i++) {
             Cell cell = header.createCell(i);
@@ -116,18 +128,23 @@ public class ExcelControl {
      * @param channel GuildChannel to write
      * @param emptyDescriptionStyle style used for the description cell when no topic exists
      */
-    private static void writeChannelRow(Sheet sheet, int rowIndex, GuildChannel channel,
+    private void writeChannelRow(Sheet sheet, int rowIndex, GuildChannel channel,
                                         CellStyle emptyDescriptionStyle) {
         Row row = sheet.createRow(rowIndex);
 
         // Sync-Flag
-        //Row syncFlagRow =
-        row.createCell(0).setCellValue("true");
-        // CellStyle wrapStyle = workbook.createCellStyle();
-        //            wrapStyle.setWrapText(true);
+        Cell syncFlagCell = row.createCell(0);
+        syncFlagCell.setCellValue("true");
 
         // Channel type
-        row.createCell(1).setCellValue(channel.getType().name());
+        Cell channelTypeCell = row.createCell(1);
+        channelTypeCell.setCellValue(channel.getType().name());
+        addFixedTypeValidation(sheet, rowIndex, 1, channel.getType().name());
+
+        CellStyle channelTypeStyle = workbook.createCellStyle();
+        channelTypeStyle.setFillForegroundColor(new XSSFColor(new java.awt.Color(217, 217, 217), null));
+        channelTypeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        channelTypeCell.setCellStyle(channelTypeStyle);
 
         // Channel name
         row.createCell(2).setCellValue(channel.getName());
@@ -137,6 +154,11 @@ public class ExcelControl {
         Cell descriptionCell = row.createCell(3);
         if (description != null && !description.isBlank()) {
             descriptionCell.setCellValue(description);
+
+            CellStyle descriptionStyle = workbook.createCellStyle();
+            descriptionStyle.setWrapText(true);
+            descriptionStyle.setVerticalAlignment(VerticalAlignment.TOP);
+            descriptionCell.setCellStyle(descriptionStyle);
         } else if (acceptsTopic(channel)) {
             descriptionCell.setCellValue("");
         } else {
@@ -157,7 +179,7 @@ public class ExcelControl {
      * @param rowIndex POI row index (0-based)
      * @param colIndex POI column index (0-based)
      */
-    private static void addEmptyOnlyValidation(Sheet sheet, int rowIndex, int colIndex) {
+    private void addEmptyOnlyValidation(Sheet sheet, int rowIndex, int colIndex) {
         DataValidationHelper validationHelper = new XSSFDataValidationHelper((XSSFSheet) sheet);
 
         String columnLetter = CellReference.convertNumToColString(colIndex);
@@ -179,7 +201,7 @@ public class ExcelControl {
      * Creates the dropdown for the Sync-Flag, with the options true/false.
      * This flag controls whether the channel should be synced or not when uploading in back to Discord.
      */
-    private static void addSyncDropdown(Sheet sheet, int lastDataRow) {
+    private void addSyncDropdown(Sheet sheet, int lastDataRow) {
         if (lastDataRow < 1) {
             return;
         }
@@ -188,7 +210,8 @@ public class ExcelControl {
         DataValidationConstraint constraint =
                 validationHelper.createExplicitListConstraint(new String[]{"true", "false"});
 
-        CellRangeAddressList addressList = new CellRangeAddressList(1, lastDataRow, 0, 0);
+        int lastDropdownRow = SpreadsheetVersion.EXCEL2007.getLastRowIndex();
+        CellRangeAddressList addressList = new CellRangeAddressList(1, lastDropdownRow, 0, 0);
 
         DataValidation validation = validationHelper.createValidation(constraint, addressList);
         validation.setSuppressDropDownArrow(true);
@@ -201,7 +224,7 @@ public class ExcelControl {
      * Creates the dropdown for the Sync-Flag, with the options true/false.
      * This flag controls whether the channel should be synced or not when uploading in back to Discord.
      */
-    private static void addTypeDropdown(Sheet sheet, int lastDataRow) {
+    private void addTypeDropdown(Sheet sheet, int lastDataRow) {
         if (lastDataRow < 1) {
             return;
         }
@@ -210,8 +233,9 @@ public class ExcelControl {
         DataValidationConstraint constraint =
                 validationHelper.createExplicitListConstraint(Arrays.stream(ChannelType.values()).map(Enum::name).toArray(String[]::new));
 
-        CellRangeAddressList addressList = new CellRangeAddressList(1, lastDataRow, 1, 1);
-
+        int firstDropdownRow = lastDataRow + 1;
+        int lastDropdownRow = SpreadsheetVersion.EXCEL2007.getLastRowIndex();
+        CellRangeAddressList addressList = new CellRangeAddressList(firstDropdownRow,  lastDropdownRow, 1, 1);
         DataValidation validation = validationHelper.createValidation(constraint, addressList);
         validation.setSuppressDropDownArrow(true);
         validation.setShowErrorBox(true);
@@ -220,15 +244,44 @@ public class ExcelControl {
     }
 
     /**
+     * Locks the channel type of a single (existing) row so it cannot be changed.
+     * The value is fixed to the original type via EXACT cell formula validation,
+     * which only accepts the exact (case-sensitive) original value.
+     * @param sheet
+     * @param rowIndex POI row index (0-based)
+     * @param colIndex POI column index (0-based)
+     * @param expectedType the channel type that must remain in the cell
+     */
+    private void addFixedTypeValidation(Sheet sheet, int rowIndex, int colIndex, String expectedType) {
+        DataValidationHelper validationHelper = new XSSFDataValidationHelper((XSSFSheet) sheet);
+
+        String columnLetter = CellReference.convertNumToColString(colIndex);
+        String cellRef = columnLetter + (rowIndex + 1);
+        DataValidationConstraint constraint =
+                validationHelper.createCustomConstraint("EXACT(" + cellRef + ",\"" + expectedType + "\")");
+
+        CellRangeAddressList addressList = new CellRangeAddressList(rowIndex, rowIndex, colIndex, colIndex);
+
+        DataValidation validation = validationHelper.createValidation(constraint, addressList);
+        validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+        validation.setShowErrorBox(true);
+        validation.createErrorBox("Kanaltyp gesperrt",
+                "Der Kanaltyp dieser Zeile darf nicht geändert werden (" + expectedType + ").");
+        sheet.addValidationData(validation);
+    }
+
+
+    /**
      * Adds conditional formatting to the Sync column: green when "true", red when "false".
      */
-    private static void addSyncConditionalFormatting(Sheet sheet, int lastDataRow) {
+    private void addSyncConditionalFormatting(Sheet sheet, int lastDataRow) {
         if (lastDataRow < 1) {
             return;
         }
 
         SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
-        CellRangeAddress[] region = {new CellRangeAddress(1, lastDataRow, 0, 0)};
+        int lastDropdownRow = SpreadsheetVersion.EXCEL2007.getLastRowIndex();
+        CellRangeAddress[] region = {new CellRangeAddress(1, lastDropdownRow, 0, 0)};
 
         ConditionalFormattingRule trueRule =
                 sheetCF.createConditionalFormattingRule(ComparisonOperator.EQUAL, "\"true\"");
@@ -245,7 +298,7 @@ public class ExcelControl {
         sheetCF.addConditionalFormatting(region, trueRule, falseRule);
     }
 
-    private static void autoSizeColumns(Sheet sheet) {
+    private void autoSizeColumns(Sheet sheet) {
         for (int col = 0; col < HEADERS.length; col++) {
             sheet.autoSizeColumn(col);
         }
@@ -270,7 +323,7 @@ public class ExcelControl {
      * @param channel
      * @return
      */
-    private static String getTopic(GuildChannel channel) {
+    private String getTopic(GuildChannel channel) {
         if (channel instanceof TextChannel textChannel) {
             return textChannel.getTopic();
         } else if (channel instanceof ForumChannel forumChannel) {
